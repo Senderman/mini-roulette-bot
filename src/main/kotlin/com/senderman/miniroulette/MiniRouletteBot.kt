@@ -9,7 +9,7 @@ import com.annimon.tgbotsmodule.services.YamlConfigLoaderService
 class MiniRouletteBot : BotModule {
     override fun botHandler(config: Config): BotHandler {
         val configLoader = YamlConfigLoaderService<BotConfig>()
-        val configFile = configLoader.configFile("/botConfigs/roulette", config.profile)
+        val configFile = configLoader.configFile("botConfigs/roulette", config.profile)
         val botConfig = configLoader.load(configFile, BotConfig::class.java)
         Services.botConfig = botConfig
         return RouletteBotHandler()

@@ -7,28 +7,39 @@ import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 
-class Game(private val handler: MainHandler, val chatId: Long, private val startTime: Int) {
+class Game(private val handler: MainHandler, val chatId: Long) {
 
-    private var maxTime: AtomicInteger = AtomicInteger(30)
+    private val maxTime = 30
     private var waitingBets = true
-    private var timer = 0
+    private var timer: AtomicInteger = AtomicInteger(0)
     private val bets = HashSet<Bet>()
     private var currentCell = -1
 
-    fun addBet(player: TgUser, text: String, messageId: Int, date: Int) {
+    fun addBet(player: TgUser, text: String, messageId: Int) {
         if (!waitingBets) {
             handler.sendMessage(chatId, "Слишком поздно!", messageId)
             return
         }
-        val target = text.trim().replace("/bet\\s+\\d+\\s+на\\s+".toRegex(), "")
+
         val amount = try {
             text.trim().split("\\s+".toRegex())[1].toInt()
         } catch (e: NumberFormatException) {
             handler.sendMessage(chatId, "Неверный формат!")
             return
         }
-        val betType = try {
-            Bet.resolveBetType(target)
+        if (amount < 1){
+            handler.sendMessage(chatId, "Ставка должна быть положительной!", messageId)
+            return
+        }
+
+        if (Services.db.getCoins(player.id) < amount) {
+            handler.sendMessage(chatId, "У вас недостаточно денег!", messageId)
+            return
+        }
+
+        val target = text.trim().replace("/bet\\s+\\d+\\s+на\\s+".toRegex(), "")
+        val bet = try {
+            Bet.createBet(player, amount, target)
         } catch (e: InvalidBetCommandException) {
             handler.sendMessage(chatId, "Неверный формат!")
             return
@@ -36,16 +47,25 @@ class Game(private val handler: MainHandler, val chatId: Long, private val start
             handler.sendMessage(chatId, "Неверный диапазон!")
             return
         }
-        if (Services.db.getCoins(player.id) < amount) {
-            handler.sendMessage(chatId, "У вас недостаточно денег!", messageId)
-            return
-        }
-        val bet = Bet.createBet(player, amount, betType, target)
+
         bets.add(bet)
         Services.db.takeCoins(player.id, amount)
-        maxTime.addAndGet(date - startTime)
+        timer.set(0)
         handler.sendMessage(chatId, "Ставка принята!", messageId)
     }
+
+    fun runTimer() {
+        handler.sendMessage(chatId, "\uD83C\uDFB0 Делайте ваши ставки\n\n$fieldString")
+        thread {
+            while (timer.get() < maxTime) {
+                timer.incrementAndGet()
+                Thread.sleep(1000)
+            }
+            handler.sendMessage(chatId, "❇️ Ставки кончились, ставок больше нет")
+            spin()
+        }
+    }
+
 
     private fun spin() {
         waitingBets = false
@@ -53,7 +73,7 @@ class Game(private val handler: MainHandler, val chatId: Long, private val start
         if (currentCell == 0)
             processZero()
         else
-            processEnd()
+            processNonZero()
         handler.removeGame(this)
     }
 
@@ -69,17 +89,17 @@ class Game(private val handler: MainHandler, val chatId: Long, private val start
                 else -> false
             }
             if (isWinner) {
-                Services.db.addCoins(bet.player.id, bet.pay)
+                Services.db.addCoins(bet.player.id, bet.pay + bet.amount)
                 text.appendln("\uD83D\uDE0E ${bet.player.name} получает ${bet.pay}")
             } else {
                 Services.db.addCoins(bet.player.id, bet.amount / 2)
-                text.appendln("\uD83D\uDE14 ${bet.player.name} получает ${bet.amount / 2}")
+                text.appendln("\uD83D\uDE14 ${bet.player.name} возвращает ${bet.amount / 2}")
             }
         }
         handler.sendMessage(chatId, text.toString())
     }
 
-    private fun processEnd() {
+    private fun processNonZero() {
         val text = StringBuilder("\uD83C\uDFB2 Итоги:\n")
         val colorEmoji = if (currentCell.isEven()) "\uD83D\uDDA4" else "❤️"
         text.append("$colorEmoji $currentCell\n\n")
@@ -95,7 +115,7 @@ class Game(private val handler: MainHandler, val chatId: Long, private val start
                 }
             }
             if (isWinner) {
-                Services.db.addCoins(bet.player.id, bet.pay)
+                Services.db.addCoins(bet.player.id, bet.pay + bet.amount)
                 text.appendln("\uD83D\uDE0E ${bet.player.name} получает ${bet.pay}")
             } else {
                 text.appendln("\uD83D\uDE14 ${bet.player.name} теряет ${bet.amount}")
@@ -107,24 +127,12 @@ class Game(private val handler: MainHandler, val chatId: Long, private val start
     private fun Int.isEven() = this % 2 == 0
     private fun Int.isOdd() = this % 2 != 0
 
-    fun runTimer() {
-        handler.sendMessage(chatId, "\uD83C\uDFB0 Делайте ваши ставки\n\n$fieldString")
-        thread {
-            while (timer < maxTime.get()) {
-                timer += 1
-                Thread.sleep(1000)
-            }
-            handler.sendMessage(chatId, "❇️ Ставки кончились, ставок больше нет")
-            spin()
-        }
-    }
-
     companion object {
         val fieldString = """
-        0💚 
-        1❤️ 2🖤 3❤️ 4🖤 5❤️ 6🖤
-        7❤️ 8🖤 9❤️ 10🖤 11❤️ ️12🖤
-    """.trimIndent()
+            0💚 
+            1❤️ 2🖤 3❤️ 4🖤 5❤️ 6🖤
+            7❤️ 8🖤 9❤️ 10🖤 11❤️ ️12🖤
+        """.trimIndent()
     }
 
 }

@@ -66,5 +66,7 @@ class RouletteBotHandler : BotHandler(), MainHandler {
         games.remove(game.chatId)
     }
 
+    override fun getGame(chatId: Long): Game? = games[chatId]
+
     override fun containsGame(chatId: Long): Boolean = chatId in games
 }

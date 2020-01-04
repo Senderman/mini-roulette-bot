@@ -4,6 +4,10 @@ interface DBService {
     fun getCoins(userId: Int): Int
     fun addCoins(userId: Int, amount: Int)
     fun takeCoins(userId: Int, amount: Int)
-    fun getLastRequestDate(userId: Int): Long
-    fun setLastRequestDate(userId: Int, date: Long)
+    fun getLastRequestDate(userId: Int): Int
+    fun setLastRequestDate(userId: Int, date: Int)
+
+    companion object {
+        const val startCoins: Int = 5000
+    }
 }

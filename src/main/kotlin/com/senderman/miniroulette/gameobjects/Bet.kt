@@ -36,9 +36,14 @@ sealed class Bet(val player: TgUser, val amount: Int) {
 
     companion object {
         /**
+         * @param player - one who bets
+         * @param amount - amount of money player's ready to pay
          * @param target - input string with target, like ч,к, 3, 2-5
+         * @return Bet subclass
+         * @throws InvalidBetCommandException if input string format is invalid
+         * @throws InvalidBetRangeException if range for bet is invalid (e.g. -1-228)
          */
-        fun createBet(player: TgUser, amount: Int, type: BetType, target: String): Bet = when (type) {
+        fun createBet(player: TgUser, amount: Int, target: String): Bet = when (resolveBetType(target)) {
             STRAIGHT -> Straight(player, amount, target[0].toInt())
             SPLIT -> Split(player, amount, target[0].toInt(), target[1].toInt())
             TRIO -> Trio(player, amount, target[0].toInt(), target[1].toInt())
@@ -49,15 +54,14 @@ sealed class Bet(val player: TgUser, val amount: Int) {
             }
         }
 
-        /**
-         * @param target - input string with target, like ч,к, 3, 2-5
-         * @return BetType for input
-         * @throws InvalidBetCommandException if input string format is invalid
-         * @throws InvalidBetRangeException if range for bet is invalid (e.g. -1-228)
-         */
-        fun resolveBetType(target: String): BetType = when {
-            target.matches("\\d+".toRegex()) -> STRAIGHT
+        private fun resolveBetType(target: String): BetType = when {
             target.matches("ч(:?[её]рное)?|к(расное)?".toRegex()) -> COLORBET
+            target.matches("\\d+".toRegex()) -> {
+                val cell = target.toInt()
+                if (cell < 0 || cell > 12)
+                    throw InvalidBetRangeException()
+                STRAIGHT
+            }
             target.matches("\\d+-\\d+".toRegex()) -> {
                 val params = target.split("-".toRegex())
                 val first = params[0].toInt()
