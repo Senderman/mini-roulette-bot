@@ -27,7 +27,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             handler.sendMessage(chatId, "Неверный формат!")
             return
         }
-        if (amount < 1){
+        if (amount < 1) {
             handler.sendMessage(chatId, "Ставка должна быть положительной!", messageId)
             return
         }
@@ -90,10 +90,14 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             }
             if (isWinner) {
                 Services.db.addCoins(bet.player.id, bet.pay + bet.amount)
-                text.appendln("\uD83D\uDE0E ${bet.player.name} получает ${bet.pay}")
+                text.appendln(
+                    "\uD83D\uDE0E ${bet.player.name} получает ${bet.pay} ${bet.amount} на ${bet.stringTarget})"
+                )
             } else {
                 Services.db.addCoins(bet.player.id, bet.amount / 2)
-                text.appendln("\uD83D\uDE14 ${bet.player.name} возвращает ${bet.amount / 2}")
+                text.appendln(
+                    "\uD83D\uDE14 ${bet.player.name} возвращает ${bet.amount / 2} ${bet.amount} на ${bet.stringTarget})"
+                )
             }
         }
         handler.sendMessage(chatId, text.toString())
@@ -116,9 +120,13 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             }
             if (isWinner) {
                 Services.db.addCoins(bet.player.id, bet.pay + bet.amount)
-                text.appendln("\uD83D\uDE0E ${bet.player.name} получает ${bet.pay}")
+                text.appendln(
+                    "\uD83D\uDE0E ${bet.player.name} получает ${bet.pay} (${bet.amount} на ${bet.stringTarget})"
+                )
             } else {
-                text.appendln("\uD83D\uDE14 ${bet.player.name} теряет ${bet.amount}")
+                text.appendln(
+                    "\uD83D\uDE14 ${bet.player.name} теряет ${bet.amount} ${bet.amount} на ${bet.stringTarget})"
+                )
             }
         }
         handler.sendMessage(chatId, text.toString())
