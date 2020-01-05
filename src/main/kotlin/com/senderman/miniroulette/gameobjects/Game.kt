@@ -91,12 +91,12 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             if (isWinner) {
                 Services.db.addCoins(bet.player.id, bet.pay + bet.amount)
                 text.appendln(
-                    "\uD83D\uDE0E ${bet.player.name} получает ${bet.pay} ${bet.amount} на ${bet.stringTarget})"
+                    "\uD83D\uDE0E ${bet.player.name} получает ${bet.pay} (${bet.amount} на ${bet.stringTarget})"
                 )
             } else {
                 Services.db.addCoins(bet.player.id, bet.amount / 2)
                 text.appendln(
-                    "\uD83D\uDE14 ${bet.player.name} возвращает ${bet.amount / 2} ${bet.amount} на ${bet.stringTarget})"
+                    "\uD83D\uDE14 ${bet.player.name} возвращает ${bet.amount / 2} (${bet.amount} на ${bet.stringTarget})"
                 )
             }
         }
@@ -125,7 +125,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
                 )
             } else {
                 text.appendln(
-                    "\uD83D\uDE14 ${bet.player.name} теряет ${bet.amount} ${bet.amount} на ${bet.stringTarget})"
+                    "\uD83D\uDE14 ${bet.player.name} теряет ${bet.amount} (${bet.amount} на ${bet.stringTarget})"
                 )
             }
         }
