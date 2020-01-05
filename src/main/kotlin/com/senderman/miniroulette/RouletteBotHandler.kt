@@ -3,6 +3,7 @@ package com.senderman.miniroulette
 import com.annimon.tgbotsmodule.BotHandler
 import com.annimon.tgbotsmodule.api.methods.Methods
 import com.senderman.miniroulette.gameobjects.Game
+import com.senderman.neblib.TgUser
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod
 import org.telegram.telegrambots.meta.api.objects.Update
 import java.util.*
@@ -30,6 +31,13 @@ class RouletteBotHandler : BotHandler(), MainHandler {
         if (!message.hasText()) return null
 
         val text = message.text
+
+        // make bet
+        if (text.toLowerCase().matches("\\d+\\s+(:?ч(:?[её]рное)?|к(:?расное)?|\\d{1,2}(:?-\\d{1,2})?)".toRegex()) &&
+            containsGame(message.chatId)
+        ) {
+            getGame(message.chatId)!!.addBet(TgUser(message.from), text, message.messageId)
+        }
 
         if (!message.isCommand) return null
 
