@@ -22,7 +22,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
         }
 
         val amount = try {
-            text.trim().split("\\s+".toRegex())[1].toInt()
+            text.trim().split("\\s+".toRegex())[0].toInt()
         } catch (e: NumberFormatException) {
             handler.sendMessage(chatId, "Неверный формат!")
             return
@@ -37,7 +37,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             return
         }
 
-        val target = text.trim().replace("/bet\\s+\\d+\\s+на\\s+".toRegex(), "")
+        val target = text.trim().replace("^\\d+\\s+".toRegex(), "")
         val bet = try {
             Bet.createBet(player, amount, target)
         } catch (e: InvalidBetCommandException) {
