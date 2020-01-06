@@ -47,4 +47,11 @@ class MongoDBService : DBService {
             Document("\$set", Document("lastReqDate", date))
         )
     }
+
+    override fun getTop10(): LinkedHashMap<Int, Int> {
+        val result = LinkedHashMap<Int, Int>()
+        val players = users.find().sort(Document("coins", -1)).limit(10)
+        players.forEach { result[it.getInteger("userId")] = it.getInteger("coins") }
+        return result
+    }
 }

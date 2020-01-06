@@ -34,7 +34,7 @@ sealed class Bet(val player: TgUser, val amount: Int, val stringTarget: String) 
     }
 
     class Color(player: TgUser, amount: Int, val color: COLOR) :
-        Bet(player, amount, if (color == COLOR.BLACK) "Черное" else "красное") {
+        Bet(player, amount, if (color == COLOR.BLACK) "черное" else "красное") {
         override val coefficient = 1
     }
 

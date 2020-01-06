@@ -22,6 +22,9 @@ internal class GameTest {
 }
 
 internal class TestDBService : DBService {
+
+    override fun getTop10(): LinkedHashMap<Int, Int>  = LinkedHashMap()
+
     override fun getCoins(userId: Int): Int = 5000
 
     override fun addCoins(userId: Int, amount: Int) {

@@ -9,5 +9,6 @@ class ExecutorKeeper(handler: RouletteBotHandler): AbstractExecutorKeeper() {
         register(Help(handler))
         register(GetCoins(handler))
         register(Balance(handler))
+        register(Top(handler))
     }
 }

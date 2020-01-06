@@ -6,6 +6,7 @@ interface DBService {
     fun takeCoins(userId: Int, amount: Int)
     fun getLastRequestDate(userId: Int): Int
     fun setLastRequestDate(userId: Int, date: Int)
+    fun getTop10(): LinkedHashMap<Int, Int>
 
     companion object {
         const val startCoins: Int = 5000
