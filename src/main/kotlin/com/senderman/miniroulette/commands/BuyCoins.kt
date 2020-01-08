@@ -5,6 +5,7 @@ import com.senderman.miniroulette.RouletteBotHandler
 import com.senderman.miniroulette.Services
 import com.senderman.miniroulette.WaitingBill
 import com.senderman.neblib.CommandExecutor
+import com.senderman.neblib.TgUser
 import org.telegram.telegrambots.meta.api.objects.Message
 import java.util.*
 
@@ -12,7 +13,7 @@ class BuyCoins(private val handler: RouletteBotHandler) : CommandExecutor {
     override val command: String
         get() = "/buy"
     override val desc: String
-        get() = "купить монетки. Формат /buy 3000. От $minAmount до $maxAmount"
+        get() = "купить монетки. Формат /buy 3000. От $minAmount до $maxAmount. Курс RUB-COINS - 1:60"
     private val qiwi = QiwiPaymentsHandler(handler)
 
     private val minAmount = 300
@@ -40,11 +41,11 @@ class BuyCoins(private val handler: RouletteBotHandler) : CommandExecutor {
             return
         }
 
-        val price = convertToRUB(amount)
+        val price = convertToRUB(amount).toDouble()
         val billId = UUID.randomUUID().toString()
         val waitingBill = WaitingBill(message.from.id, amount, billId)
         handler.sendMessage(chatId, "Генерация счета...")
-        val paymentFormUrl = qiwi.getPaymentForm(billId, price.toDouble())
+        val paymentFormUrl = qiwi.getPaymentFormUrl(TgUser(message.from), amount, price, billId)
         Services.db.addWaitingBill(waitingBill)
         val text = """
             В течение ${qiwi.waitingFor} дней вам нужно перейти по ссылке $paymentFormUrl и оплатить счет.

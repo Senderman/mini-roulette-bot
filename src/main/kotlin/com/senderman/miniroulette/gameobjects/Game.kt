@@ -141,7 +141,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
                     text.appendln("\uD83D\uDE0E +${bet.pay} (${bet.amount} на ${bet.stringTarget})")
                 } else {
                     delta -= bet.amount
-                    text.appendln("\uD83D\uDE14 -${bet.amount / 2} (${bet.amount} на ${bet.stringTarget})")
+                    text.appendln("\uD83D\uDE14 -${bet.amount} (${bet.amount} на ${bet.stringTarget})")
                 }
             }
 
