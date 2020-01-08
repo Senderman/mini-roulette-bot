@@ -8,6 +8,10 @@ interface DBService {
     fun setLastRequestDate(userId: Int, date: Int)
     fun getTop10(): LinkedHashMap<Int, Int>
 
+    fun getWaitingBills(): Set<WaitingBill>
+    fun addWaitingBill(bill: WaitingBill)
+    fun removeBill(billId: String)
+
     companion object {
         const val startCoins: Int = 5000
     }
