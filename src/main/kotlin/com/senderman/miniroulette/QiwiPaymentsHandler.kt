@@ -28,7 +28,7 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
         val billInfo = CreateBillInfo(
             billId,
             moneyAmount,
-            "Донат в мини-рулетку от ${user.name} на $coins монеток",
+            "Донат в бота от ${user.name} на $coins монеток",
             ZonedDateTime.now().plusDays(15),
             null,
             successUrl
