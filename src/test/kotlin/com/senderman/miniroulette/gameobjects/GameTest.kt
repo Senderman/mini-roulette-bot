@@ -3,6 +3,7 @@ package com.senderman.miniroulette.gameobjects
 import com.senderman.miniroulette.DBService
 import com.senderman.miniroulette.MainHandler
 import com.senderman.miniroulette.Services
+import com.senderman.miniroulette.WaitingBill
 import org.junit.jupiter.api.Test
 
 internal class GameTest {
@@ -25,6 +26,14 @@ internal class GameTest {
 internal class TestDBService : DBService {
 
     override fun getTop10(): LinkedHashMap<Int, Int>  = LinkedHashMap()
+    override fun getWaitingBills(): Set<WaitingBill> {
+    }
+
+    override fun addWaitingBill(bill: WaitingBill) {
+    }
+
+    override fun removeBill(billId: String) {
+    }
 
     override fun getCoins(userId: Int): Int = 5000
 
