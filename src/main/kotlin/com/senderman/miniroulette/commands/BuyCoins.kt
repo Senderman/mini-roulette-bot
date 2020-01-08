@@ -35,6 +35,8 @@ class BuyCoins(private val handler: RouletteBotHandler) : CommandExecutor {
         } catch (e: NumberFormatException) {
             handler.sendMessage(chatId, "Неверный формат!")
             return
+        } catch (e: IndexOutOfBoundsException) {
+            return
         }
         if (amount < minAmount || amount > maxAmount) {
             handler.sendMessage(chatId, "Неверное значение!")

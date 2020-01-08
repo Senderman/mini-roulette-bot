@@ -2,9 +2,9 @@ package com.senderman.miniroulette.gameobjects
 
 import com.senderman.miniroulette.gameobjects.BetType.*
 
-enum class COLOR {
-    BLACK,
-    RED
+enum class COLOR(val color:String) {
+    BLACK("черное"),
+    RED("красное")
 }
 
 sealed class Bet(val amount: Int, val stringTarget: String) {
@@ -33,7 +33,7 @@ sealed class Bet(val amount: Int, val stringTarget: String) {
     }
 
     class Color(amount: Int, val color: COLOR) :
-        Bet(amount, if (color == COLOR.BLACK) "черное" else "красное") {
+        Bet(amount, color.color) {
         override val coefficient = 1
     }
 
@@ -48,7 +48,7 @@ sealed class Bet(val amount: Int, val stringTarget: String) {
         fun createBet(amount: Int, target: String): Bet = when (resolveBetType(target)) {
             STRAIGHT -> Straight(amount, target.toInt())
             COLORBET -> {
-                val color = if (target == "ч") COLOR.BLACK else COLOR.RED
+                val color = if (target[0] == 'ч') COLOR.BLACK else COLOR.RED
                 Color(amount, color)
             }
             SPLIT -> {

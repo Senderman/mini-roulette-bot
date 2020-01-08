@@ -9,13 +9,13 @@ import kotlin.concurrent.thread
 class Game(private val handler: MainHandler, val chatId: Long) {
 
     private val maxTime = 30
-    private var waitingBets = true
+    private var waitingForBets = true
     private var timer: AtomicInteger = AtomicInteger(0)
     private val players = HashMap<Int, Player>() // id-player
     private var currentCell = -1
 
     fun addBet(userId: Int, name: String, text: String, messageId: Int) {
-        if (!waitingBets) {
+        if (!waitingForBets) {
             handler.sendMessage(chatId, "Слишком поздно!", messageId)
             return
         }
@@ -74,7 +74,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
 
 
     private fun spin() {
-        waitingBets = false
+        waitingForBets = false
         currentCell = ThreadLocalRandom.current().nextInt(0, 13)
         if (currentCell == 0)
             processZero()
@@ -111,7 +111,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             }
 
             Services.db.addCoins(player.id, profit)
-            text.append("〽: ").appendln(formatDelta(delta))
+            text.append("\uD83D\uDCC8: ").appendln(formatDelta(delta)).appendln()
         }
         handler.sendMessage(chatId, text.toString())
     }
@@ -147,7 +147,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             }
 
             Services.db.addCoins(player.id, profit)
-            text.append("〽: ").appendln(formatDelta(delta))
+            text.append("\uD83D\uDCC8: ").appendln(formatDelta(delta)).appendln()
         }
         handler.sendMessage(chatId, text.toString())
     }

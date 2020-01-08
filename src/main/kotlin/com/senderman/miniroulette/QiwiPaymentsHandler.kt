@@ -5,13 +5,11 @@ import com.qiwi.billpayments.sdk.model.BillStatus
 import com.qiwi.billpayments.sdk.model.MoneyAmount
 import com.qiwi.billpayments.sdk.model.`in`.CreateBillInfo
 import com.senderman.neblib.TgUser
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 class QiwiPaymentsHandler(private val handler: MainHandler) {
     private val secretKey = System.getenv("qiwisecret")
@@ -36,28 +34,30 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
         return client.createBill(billInfo).payUrl
     }
 
-    fun runBillChecking() = GlobalScope.launch {
+    fun runBillChecking() = thread {
         while (true) {
-            for (bill in Services.db.getWaitingBills()) {
-                val status = client.getBillInfo(bill.billId).status.value
-                if (status.isWaiting()) continue
+            forLoop@ for (bill in Services.db.getWaitingBills()) {
+                val status = client.getBillInfo(bill.billId).status.value!!
+                if (status == BillStatus.WAITING) continue
 
-                when {
-                    status.isExpired() -> {
+                when (status) {
+                    BillStatus.WAITING -> continue@forLoop
+
+                    BillStatus.EXPIRED -> {
                         handler.sendMessage(
                             bill.userId.toLong(),
                             "Ожидание платежа за ${bill.coins} монет истекло!"
                         )
                         Services.db.removeBill(bill.billId)
                     }
-                    status.isRejected() -> {
+                    BillStatus.REJECTED -> {
                         handler.sendMessage(
                             bill.userId.toLong(),
                             "Платеж за ${bill.coins} монет был отклонен!"
                         )
                         Services.db.removeBill(bill.billId)
                     }
-                    status.isPaid() -> {
+                    BillStatus.PAID -> {
                         Services.db.addCoins(bill.userId, bill.coins)
                         handler.sendMessage(
                             bill.userId.toLong(),
@@ -66,14 +66,9 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
                         Services.db.removeBill(bill.billId)
                     }
                 }
-                delay(TimeUnit.SECONDS.toMillis(2))
+                Thread.sleep(TimeUnit.SECONDS.toMillis(2))
             }
-            delay(TimeUnit.MINUTES.toMillis(checkInterval))
+            Thread.sleep(TimeUnit.MINUTES.toMillis(checkInterval))
         }
     }
-
-    private fun BillStatus.isPaid() = this.value == "PAID"
-    private fun BillStatus.isExpired() = this.value == "EXPIRED"
-    private fun BillStatus.isRejected() = this.value == "REJECTED"
-    private fun BillStatus.isWaiting() = this.value == "WAITING"
 }

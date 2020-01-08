@@ -19,6 +19,8 @@ class GiveMoney(private val handler: RouletteBotHandler) : CommandExecutor {
             message.text.split("\\s+".toRegex())[1].toInt()
         } catch (e: NumberFormatException) {
             return
+        } catch (e: IndexOutOfBoundsException){
+            return
         }
         if (amount < 1) return
 
