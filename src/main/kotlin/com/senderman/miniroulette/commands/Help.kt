@@ -25,7 +25,7 @@ class Help(
         }
         help.insert(0, Services.botConfig.help + "\n\n")
         try {
-            val sm = SendMessage(message.chatId, help.toString())
+            val sm = SendMessage(message.from.id.toLong(), help.toString())
             handler.execute(sm)
             if (!message.isUserMessage){
                 handler.sendMessage(message.chatId, "✅ Помощь отправлена вам в лс", message.messageId)

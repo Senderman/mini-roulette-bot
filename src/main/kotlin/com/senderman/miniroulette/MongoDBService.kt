@@ -16,7 +16,10 @@ class MongoDBService : DBService {
     private fun getUser(userId: Int): Document {
         val doc = users.find(eq("userId", userId)).first()
         if (doc == null) {
-            val commit = Document("userId", userId).append("coins", DBService.startCoins).append("lastReqDate", 0)
+            val commit = Document("userId", userId)
+                .append("coins", DBService.startCoins)
+                .append("lastReqDate", 0)
+                .append("last10requestDate", 0)
             users.insertOne(commit)
             return commit
         }
@@ -41,15 +44,26 @@ class MongoDBService : DBService {
         )
     }
 
-    override fun getLastRequestDate(userId: Int): Int = getUser(userId).getInteger("lastReqDate")
-
-    override fun setLastRequestDate(userId: Int, date: Int) {
+    override fun setLast300RequestDate(userId: Int, date: Int) {
         getUser(userId)
         users.updateOne(
             eq("userId", userId),
             Document("\$set", Document("lastReqDate", date))
         )
     }
+
+    override fun getLast300RequestDate(userId: Int): Int = getUser(userId).getInteger("lastReqDate")
+
+    override fun setLast10RequestDate(userId: Int, date: Int) {
+        getUser(userId)
+        users.updateOne(
+            eq("userId", userId),
+            Document("\$set", Document("last10requestDate", date))
+        )
+    }
+
+    override fun getLast10RequestDate(userId: Int): Int = getUser(userId).getInteger("last10requestDate")
+
 
     override fun getTop10(): LinkedHashMap<Int, Int> {
         val result = LinkedHashMap<Int, Int>()

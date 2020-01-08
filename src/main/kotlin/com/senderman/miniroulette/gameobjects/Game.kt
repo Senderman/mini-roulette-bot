@@ -13,8 +13,10 @@ class Game(private val handler: MainHandler, val chatId: Long) {
     private var timer: AtomicInteger = AtomicInteger(0)
     private val players = HashMap<Int, Player>() // id-player
     private var currentCell = -1
+    private val messagesToDelete = HashSet<Int>()
 
     fun addBet(userId: Int, name: String, text: String, messageId: Int) {
+        messagesToDelete.add(messageId)
         if (!waitingForBets) {
             handler.sendMessage(chatId, "Слишком поздно!", messageId)
             return
@@ -57,7 +59,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
 
         Services.db.takeCoins(userId, amount)
         timer.set(0)
-        handler.sendMessage(chatId, "Ставка принята!", messageId)
+        messagesToDelete.add(handler.sendMessage(chatId, "Ставка принята!", messageId).messageId)
     }
 
     fun runTimer() {
@@ -80,6 +82,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             processZero()
         else
             processNonZero()
+        messagesToDelete.forEach{handler.deleteMessage(chatId, it)}
         handler.removeGame(this)
     }
 
@@ -111,9 +114,9 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             }
 
             Services.db.addCoins(player.id, profit)
-            text.append("\uD83D\uDCC8: ").appendln(formatDelta(delta)).appendln()
+            text.appendln(formatDelta(delta)).appendln()
         }
-        handler.sendMessage(chatId, text.toString())
+        handler.sendMessage(chatId, text.trim().toString())
     }
 
     private fun processNonZero() {
@@ -147,14 +150,14 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             }
 
             Services.db.addCoins(player.id, profit)
-            text.append("\uD83D\uDCC8: ").appendln(formatDelta(delta)).appendln()
+            text.appendln(formatDelta(delta)).appendln()
         }
-        handler.sendMessage(chatId, text.toString())
+        handler.sendMessage(chatId, text.trim().toString())
     }
 
     private fun Int.isEven() = this % 2 == 0
     private fun Int.isOdd() = this % 2 != 0
-    private fun formatDelta(delta: Int) = if (delta > 0) "+$delta" else delta.toString()
+    private fun formatDelta(delta: Int) = if (delta > 0) "\uD83D\uDCC8: +$delta" else "\uD83D\uDCC9: $delta"
 
     companion object {
         val fieldString = """

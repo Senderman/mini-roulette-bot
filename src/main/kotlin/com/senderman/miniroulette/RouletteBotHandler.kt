@@ -4,8 +4,10 @@ import com.annimon.tgbotsmodule.BotHandler
 import com.annimon.tgbotsmodule.api.methods.Methods
 import com.senderman.miniroulette.gameobjects.Game
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod
+import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.Update
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
 
 class RouletteBotHandler : BotHandler(), MainHandler {
@@ -25,7 +27,7 @@ class RouletteBotHandler : BotHandler(), MainHandler {
 
         val message = update.message
         // don't handle old messages
-        if (message.date + 120 < System.currentTimeMillis() / 1000) return null
+        if (message.date + TimeUnit.MINUTES.toSeconds(2) < System.currentTimeMillis() / 1000) return null
 
         if (!message.hasText()) return null
 
@@ -53,12 +55,15 @@ class RouletteBotHandler : BotHandler(), MainHandler {
         return null
     }
 
-    override fun sendMessage(chatId: Long, text: String, replyToMessageId: Int?) {
+    override fun sendMessage(chatId: Long, text: String, replyToMessageId: Int?): Message =
         Methods.sendMessage(chatId, text)
             .setReplyToMessageId(replyToMessageId)
             .enableHtml()
             .disableWebPagePreview()
             .call(this)
+
+    override fun deleteMessage(chatId: Long, messageId: Int) {
+        Methods.deleteMessage(chatId, messageId).call(this)
     }
 
     override fun getBotUsername(): String = Services.botConfig.login.split(" ".toRegex(), 2)[0]

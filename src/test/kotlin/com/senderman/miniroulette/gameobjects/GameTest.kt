@@ -43,9 +43,9 @@ internal class TestDBService : DBService {
     override fun takeCoins(userId: Int, amount: Int) {
     }
 
-    override fun getLastRequestDate(userId: Int): Int = 0
+    override fun getLast300RequestDate(userId: Int): Int = 0
 
-    override fun setLastRequestDate(userId: Int, date: Int) {
+    override fun setLast300RequestDate(userId: Int, date: Int) {
     }
 }
 
