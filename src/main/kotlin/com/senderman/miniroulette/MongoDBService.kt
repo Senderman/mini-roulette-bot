@@ -7,8 +7,10 @@ import com.senderman.neblib.MongoClientKeeper
 import org.bson.Document
 
 class MongoDBService : DBService {
+    operator fun MongoDatabase.get(s: String): MongoCollection<Document> = getCollection(s)
+
     private val database: MongoDatabase = MongoClientKeeper.client.getDatabase("roulette")
-    private val users: MongoCollection<Document> = database.getCollection("users")
+    private val users: MongoCollection<Document> = database["users"]
 
     private fun getUser(userId: Int): Document {
         val doc = users.find(eq("userId", userId)).first()

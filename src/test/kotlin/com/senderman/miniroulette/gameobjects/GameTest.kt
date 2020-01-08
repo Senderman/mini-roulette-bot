@@ -37,7 +37,6 @@ internal class TestDBService : DBService {
 
     override fun setLastRequestDate(userId: Int, date: Int) {
     }
-
 }
 
 internal class TestHandler : MainHandler {
