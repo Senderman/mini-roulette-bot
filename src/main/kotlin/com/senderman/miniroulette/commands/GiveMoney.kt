@@ -12,8 +12,7 @@ class GiveMoney(private val handler: RouletteBotHandler) : CommandExecutor {
         get() = "(reply) дать монетки. формат /give x"
 
     override fun execute(message: Message) {
-        if (!message.isReply)
-            return
+        if (!message.isReply) return
 
         val chatId = message.chatId
         val amount = try {
@@ -21,17 +20,23 @@ class GiveMoney(private val handler: RouletteBotHandler) : CommandExecutor {
         } catch (e: NumberFormatException) {
             return
         }
-        val sender = message.from.id
-        val receiver = message.replyToMessage.from.id
-        if (Services.db.getCoins(sender) - 10 < amount) {
+        if (amount < 1) return
+
+        val sender = message.from
+        val receiver = message.replyToMessage.from
+        if (receiver.bot){
+            handler.sendMessage(chatId, "Но это же бот!", message.messageId)
+            return
+        }
+        if (Services.db.getCoins(sender.id) - 10 < amount) {
             handler.sendMessage(
                 chatId, "У вас недостаточно денег (на балансе должно остаться минимум 10 монет!",
                 message.messageId
             )
             return
         }
-        Services.db.takeCoins(sender, amount)
-        Services.db.addCoins(receiver, amount)
+        Services.db.takeCoins(sender.id, amount)
+        Services.db.addCoins(receiver.id, amount)
         handler.sendMessage(chatId, "✅ Успешно!", message.messageId)
     }
 }
