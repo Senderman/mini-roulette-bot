@@ -2,7 +2,6 @@ package com.senderman.miniroulette.gameobjects
 
 import com.senderman.miniroulette.MainHandler
 import com.senderman.miniroulette.Services
-import com.senderman.neblib.TgUser
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
@@ -12,10 +11,10 @@ class Game(private val handler: MainHandler, val chatId: Long) {
     private val maxTime = 30
     private var waitingBets = true
     private var timer: AtomicInteger = AtomicInteger(0)
-    private val bets = HashSet<Bet>()
+    private val players = HashMap<Int, Player>() // id-player
     private var currentCell = -1
 
-    fun addBet(player: TgUser, text: String, messageId: Int) {
+    fun addBet(userId: Int, name: String, text: String, messageId: Int) {
         if (!waitingBets) {
             handler.sendMessage(chatId, "Слишком поздно!", messageId)
             return
@@ -32,14 +31,14 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             return
         }
 
-        if (Services.db.getCoins(player.id) < amount) {
+        if (Services.db.getCoins(userId) < amount) {
             handler.sendMessage(chatId, "У вас недостаточно денег!", messageId)
             return
         }
 
         val target = text.trim().replace("^\\d+\\s+".toRegex(), "")
         val bet = try {
-            Bet.createBet(player, amount, target)
+            Bet.createBet(amount, target)
         } catch (e: InvalidBetCommandException) {
             handler.sendMessage(chatId, "Неверный формат!")
             return
@@ -48,8 +47,15 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             return
         }
 
-        bets.add(bet)
-        Services.db.takeCoins(player.id, amount)
+        if (userId in players)
+            players[userId]!!.bets.add(bet)
+        else {
+            val player = Player(userId, name)
+            player.bets.add(bet)
+            players[userId] = player
+        }
+
+        Services.db.takeCoins(userId, amount)
         timer.set(0)
         handler.sendMessage(chatId, "Ставка принята!", messageId)
     }
@@ -80,25 +86,31 @@ class Game(private val handler: MainHandler, val chatId: Long) {
     private fun processZero() {
         val text = StringBuilder("\uD83C\uDFB2 Итоги:\n")
         text.append("\uD83D\uDC9A 0\n\n")
-        for (bet in bets) {
-            val isWinner = when (bet) {
-                is Bet.Straight -> bet.target == 0
-                is Bet.Split -> bet.first == 0
-                is Bet.Trio -> bet.first == 0
-                is Bet.Corner -> bet.first == 0
-                else -> false
+        for (player in players.values) {
+            text.appendln("<b>${player.name}:</b>")
+            var profit = 0
+            var delta = 0
+
+            for (bet in player.bets) {
+                val winBet = when (bet) {
+                    is Bet.Straight -> bet.target == 0
+                    is Bet.Split -> bet.first == 0
+                    is Bet.Trio -> bet.first == 0
+                    is Bet.Corner -> bet.first == 0
+                    is Bet.Color -> false
+                }
+                if (winBet) {
+                    profit = bet.pay + bet.amount
+                    delta += bet.pay
+                    text.appendln("\uD83D\uDE0E +${bet.pay} (${bet.amount} на ${bet.stringTarget})")
+                } else {
+                    delta -= bet.amount / 2
+                    text.appendln("\uD83D\uDE14 -${bet.amount / 2} (${bet.amount} на ${bet.stringTarget})")
+                }
             }
-            if (isWinner) {
-                Services.db.addCoins(bet.player.id, bet.pay + bet.amount)
-                text.appendln(
-                    "\uD83D\uDE0E ${bet.player.name} получает ${bet.pay} (${bet.amount} на ${bet.stringTarget})"
-                )
-            } else {
-                Services.db.addCoins(bet.player.id, bet.amount / 2)
-                text.appendln(
-                    "\uD83D\uDE14 ${bet.player.name} возвращает ${bet.amount / 2} (${bet.amount} на ${bet.stringTarget})"
-                )
-            }
+
+            Services.db.addCoins(player.id, profit)
+            text.append("〽: ").appendln(formatDelta(delta))
         }
         handler.sendMessage(chatId, text.toString())
     }
@@ -107,33 +119,41 @@ class Game(private val handler: MainHandler, val chatId: Long) {
         val text = StringBuilder("\uD83C\uDFB2 Итоги:\n")
         val colorEmoji = if (currentCell.isEven()) "\uD83D\uDDA4" else "❤️"
         text.append("$colorEmoji $currentCell\n\n")
-        for (bet in bets) {
-            val isWinner = when (bet) {
-                is Bet.Straight -> bet.target == currentCell
-                is Bet.Split -> bet.first == currentCell || bet.second == currentCell
-                is Bet.Trio -> bet.first <= currentCell && bet.last >= currentCell
-                is Bet.Corner -> bet.first <= currentCell && bet.last >= currentCell
-                is Bet.Color -> when (bet.color) {
-                    COLOR.BLACK -> currentCell.isEven()
-                    COLOR.RED -> currentCell.isOdd()
+        for (player in players.values) {
+            text.appendln("<b>${player.name}:</b>")
+            var profit = 0
+            var delta = 0
+
+            for (bet in player.bets) {
+                val winBet = when (bet) {
+                    is Bet.Straight -> bet.target == currentCell
+                    is Bet.Split -> bet.first == currentCell || bet.second == currentCell
+                    is Bet.Trio -> bet.first <= currentCell && bet.last >= currentCell
+                    is Bet.Corner -> bet.first <= currentCell && bet.last >= currentCell
+                    is Bet.Color -> when (bet.color) {
+                        COLOR.BLACK -> currentCell.isEven()
+                        COLOR.RED -> currentCell.isOdd()
+                    }
+                }
+                if (winBet) {
+                    profit += bet.amount + bet.pay
+                    delta += bet.pay
+                    text.appendln("\uD83D\uDE0E +${bet.pay} (${bet.amount} на ${bet.stringTarget})")
+                } else {
+                    delta -= bet.amount
+                    text.appendln("\uD83D\uDE14 -${bet.amount / 2} (${bet.amount} на ${bet.stringTarget})")
                 }
             }
-            if (isWinner) {
-                Services.db.addCoins(bet.player.id, bet.pay + bet.amount)
-                text.appendln(
-                    "\uD83D\uDE0E ${bet.player.name} получает ${bet.pay} (${bet.amount} на ${bet.stringTarget})"
-                )
-            } else {
-                text.appendln(
-                    "\uD83D\uDE14 ${bet.player.name} теряет ${bet.amount} (${bet.amount} на ${bet.stringTarget})"
-                )
-            }
+
+            Services.db.addCoins(player.id, profit)
+            text.append("〽: ").appendln(formatDelta(delta))
         }
         handler.sendMessage(chatId, text.toString())
     }
 
     private fun Int.isEven() = this % 2 == 0
     private fun Int.isOdd() = this % 2 != 0
+    private fun formatDelta(delta: Int) = if (delta > 0) "+$delta" else delta.toString()
 
     companion object {
         val fieldString = """

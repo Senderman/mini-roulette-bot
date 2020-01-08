@@ -3,7 +3,6 @@ package com.senderman.miniroulette.gameobjects
 import com.senderman.miniroulette.DBService
 import com.senderman.miniroulette.MainHandler
 import com.senderman.miniroulette.Services
-import com.senderman.neblib.TgUser
 import org.junit.jupiter.api.Test
 
 internal class GameTest {
@@ -14,7 +13,9 @@ internal class GameTest {
         val game = Game(handler, 0)
         handler.addGame(game)
         game.runTimer()
-        game.addBet(TgUser(123, "Юлька"), "/bet 20 на 1-3", 1)
+        game.addBet(123, "Юлька", "20 1-3", 1)
+        game.addBet(123, "Юлька", "300 1-3", 1)
+        game.addBet(111, "Пасюк", "228 0", 1)
         while (handler.containsGame(0))
             Thread.sleep(500)
         assert(true)

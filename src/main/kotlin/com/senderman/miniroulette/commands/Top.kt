@@ -3,7 +3,7 @@ package com.senderman.miniroulette.commands
 import com.annimon.tgbotsmodule.api.methods.Methods
 import com.senderman.miniroulette.RouletteBotHandler
 import com.senderman.miniroulette.Services
-import com.senderman.miniroulette.UserStats
+import com.senderman.miniroulette.gameobjects.Player
 import com.senderman.neblib.CommandExecutor
 import org.telegram.telegrambots.meta.api.objects.Message
 
@@ -19,7 +19,7 @@ class Top(private val handler: RouletteBotHandler) : CommandExecutor {
         var counter = 1
         for ((userId, coins) in top) {
             val name = Methods.getChatMember(userId.toLong(), userId).call(handler).user.firstName ?: "Без имени"
-            val player = UserStats(userId, name, coins)
+            val player = Player(userId, name, coins)
             text.append(counter).append(": ")
             if (message.isUserMessage) text.append(player.link) else text.append(player.name)
             text.appendln(" - ${player.coins}$")
