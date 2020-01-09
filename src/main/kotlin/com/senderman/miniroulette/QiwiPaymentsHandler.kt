@@ -1,7 +1,7 @@
 package com.senderman.miniroulette
 
 import com.qiwi.billpayments.sdk.client.BillPaymentClientFactory
-import com.qiwi.billpayments.sdk.model.BillStatus
+import com.qiwi.billpayments.sdk.model.BillStatus.*
 import com.qiwi.billpayments.sdk.model.MoneyAmount
 import com.qiwi.billpayments.sdk.model.`in`.CreateBillInfo
 import com.senderman.neblib.TgUser
@@ -38,30 +38,35 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
         while (true) {
             forLoop@ for (bill in Services.db.getWaitingBills()) {
                 val status = client.getBillInfo(bill.billId).status.value!!
-                if (status == BillStatus.WAITING) continue
+                if (status == WAITING) continue
 
                 when (status) {
-                    BillStatus.WAITING -> continue@forLoop
+                    WAITING -> continue@forLoop
 
-                    BillStatus.EXPIRED -> {
+                    EXPIRED -> {
                         handler.sendMessage(
                             bill.userId.toLong(),
                             "Ожидание платежа за ${bill.coins} монет истекло!"
                         )
                         Services.db.removeBill(bill.billId)
                     }
-                    BillStatus.REJECTED -> {
+                    REJECTED -> {
                         handler.sendMessage(
                             bill.userId.toLong(),
                             "Платеж за ${bill.coins} монет был отклонен!"
                         )
                         Services.db.removeBill(bill.billId)
                     }
-                    BillStatus.PAID -> {
+                    PAID -> {
                         Services.db.addCoins(bill.userId, bill.coins)
                         handler.sendMessage(
                             bill.userId.toLong(),
                             "Платеж за ${bill.coins} монет выполнен! Приятной игры!"
+                        )
+                        handler.sendMessage(
+                            Services.botConfig.mainAdmin.toLong(),
+                            "Поступил донат на ${bill.coins / 60} рублей от" +
+                                    "<a href=\"tg://user?id=${bill.userId}\">этого</a> юзера!"
                         )
                         Services.db.removeBill(bill.billId)
                     }
