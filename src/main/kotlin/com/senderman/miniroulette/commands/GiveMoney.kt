@@ -9,7 +9,7 @@ class GiveMoney(private val handler: RouletteBotHandler) : CommandExecutor {
     override val command: String
         get() = "/give"
     override val desc: String
-        get() = "(reply) дать монетки. формат /give x"
+        get() = "(reply) дать монетки. Формат /give x"
 
     override fun execute(message: Message) {
         if (!message.isReply) return

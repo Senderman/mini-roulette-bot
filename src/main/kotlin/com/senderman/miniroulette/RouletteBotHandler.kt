@@ -50,7 +50,10 @@ class RouletteBotHandler : BotHandler(), MainHandler {
             .replace("@$botUsername", "")
         if ("@" in command) return null
 
-        executorKeeper.findExecutor(command)?.execute(message)
+        executorKeeper.findExecutor(command)?.let { executor ->
+            if (message.from.id != Services.botConfig.mainAdmin && executor.forMainAdmin) return null
+            executor.execute(message)
+        }
 
         return null
     }

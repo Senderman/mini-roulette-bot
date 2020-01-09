@@ -9,7 +9,7 @@ class StartGame(private val handler: RouletteBotHandler) : CommandExecutor {
     override val command: String
         get() = "/rourun"
     override val desc: String
-        get() = "Начать игру"
+        get() = "начать игру"
 
     override fun execute(message: Message) {
         val chatId = message.chatId
