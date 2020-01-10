@@ -21,7 +21,7 @@ class Top(private val handler: RouletteBotHandler) : CommandExecutor {
         for ((userId, coins) in top) {
             val name = try {
                 Methods.getChatMember(userId.toLong(), userId).call(handler).user.firstName
-            } catch (e: TelegramApiException) {
+            } catch (e: IllegalStateException) {
                 "Без имени"
             }
             val player = Player(userId, name, coins)
