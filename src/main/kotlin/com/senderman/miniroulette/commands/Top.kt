@@ -6,6 +6,7 @@ import com.senderman.miniroulette.Services
 import com.senderman.miniroulette.gameobjects.Player
 import com.senderman.neblib.CommandExecutor
 import org.telegram.telegrambots.meta.api.objects.Message
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
 class Top(private val handler: RouletteBotHandler) : CommandExecutor {
     override val command: String
@@ -18,7 +19,11 @@ class Top(private val handler: RouletteBotHandler) : CommandExecutor {
         val text = StringBuilder("\uD83D\uDCB0 <b>Топ-10 богачей:\n\n</b>")
         var counter = 1
         for ((userId, coins) in top) {
-            val name = Methods.getChatMember(userId.toLong(), userId).call(handler).user.firstName ?: "Без имени"
+            val name = try {
+                Methods.getChatMember(userId.toLong(), userId).call(handler).user.firstName
+            } catch (e: TelegramApiException) {
+                "Без имени"
+            }
             val player = Player(userId, name, coins)
             text.append(counter).append(": ")
             if (message.isUserMessage) text.append(player.link) else text.append(player.name)

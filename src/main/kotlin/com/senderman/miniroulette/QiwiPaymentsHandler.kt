@@ -38,7 +38,6 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
         while (true) {
             forLoop@ for (bill in Services.db.getWaitingBills()) {
                 val status = client.getBillInfo(bill.billId).status.value!!
-                if (status == WAITING) continue
 
                 when (status) {
                     WAITING -> continue@forLoop

@@ -4,8 +4,10 @@ import com.annimon.tgbotsmodule.BotHandler
 import com.annimon.tgbotsmodule.api.methods.Methods
 import com.senderman.miniroulette.gameobjects.Game
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.Update
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
@@ -66,7 +68,12 @@ class RouletteBotHandler : BotHandler(), MainHandler {
             .call(this)
 
     override fun deleteMessage(chatId: Long, messageId: Int) {
-        Methods.deleteMessage(chatId, messageId).call(this)
+        try {
+            val delMsg = DeleteMessage(chatId, messageId)
+            execute(delMsg)
+        } catch (e: TelegramApiException) {
+            // nothing here
+        }
     }
 
     override fun getBotUsername(): String = Services.botConfig.login.split(" ".toRegex(), 2)[0]
