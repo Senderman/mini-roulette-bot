@@ -26,7 +26,7 @@ sealed class Bet(val amount: Int, val stringTarget: String) {
         }
     }
 
-    sealed class RangeBet (amount: Int, private val first: Int, private val last: Int) : Bet(amount, "$first-$last") {
+    sealed class RangeBet(amount: Int, private val first: Int, private val last: Int) : Bet(amount, "$first-$last") {
 
         override fun isWin(cell: Int) = cell in first..last
 
@@ -89,7 +89,7 @@ sealed class Bet(val amount: Int, val stringTarget: String) {
                 Type.STRAIGHT
             }
             target.matches("\\d+-\\d+".toRegex()) -> {
-                val params = target.split("-".toRegex())
+                val params = target.split("-")
                 val first = params[0].toInt()
                 val second = params[1].toInt()
                 if (first < 0 || second > 12 || first >= second)

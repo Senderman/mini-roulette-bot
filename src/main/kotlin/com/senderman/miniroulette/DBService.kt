@@ -8,7 +8,7 @@ interface DBService {
     fun setLast300RequestDate(userId: Int, date: Int)
     fun getLast300RequestDate(userId: Int): Int
     fun setLast10RequestDate(userId: Int, date: Int)
-    fun getLast10RequestDate(userId:Int):Int
+    fun getLast10RequestDate(userId: Int): Int
 
     fun getTop10(): LinkedHashMap<Int, Int>
 

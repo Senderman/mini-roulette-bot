@@ -6,7 +6,6 @@ import com.senderman.miniroulette.Services
 import com.senderman.miniroulette.gameobjects.Player
 import com.senderman.neblib.CommandExecutor
 import org.telegram.telegrambots.meta.api.objects.Message
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
 class Top(private val handler: RouletteBotHandler) : CommandExecutor {
     override val command: String

@@ -25,14 +25,14 @@ class GetCoins(private val handler: RouletteBotHandler) : CommandExecutor {
             handler.sendMessage(chatId, "Просить монетки при балансе >0 можно только раз в день!", messageId)
             return
         }
-        if (currentCoins == 0 && message.date - Services.db.getLast10RequestDate(userId) < TimeUnit.MINUTES.toSeconds(5)){
+        if (currentCoins == 0 && message.date - Services.db.getLast10RequestDate(userId) < TimeUnit.MINUTES.toSeconds(5)) {
             handler.sendMessage(chatId, "Просить монетки при балансе = 0 можно только раз в 5 минут!", messageId)
             return
         }
         val amountToAdd = if (currentCoins == 0) 10 else 300
         if (amountToAdd == 300) {
             Services.db.setLast300RequestDate(userId, message.date)
-        } else if (amountToAdd == 10){
+        } else if (amountToAdd == 10) {
             Services.db.setLast10RequestDate(userId, message.date)
         }
         Services.db.addCoins(userId, amountToAdd)

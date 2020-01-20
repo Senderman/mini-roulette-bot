@@ -3,7 +3,7 @@ package com.senderman.miniroulette
 import com.senderman.miniroulette.commands.*
 import com.senderman.neblib.AbstractExecutorKeeper
 
-class ExecutorKeeper(handler: RouletteBotHandler): AbstractExecutorKeeper() {
+class ExecutorKeeper(handler: RouletteBotHandler) : AbstractExecutorKeeper() {
     init {
         register(StartGame(handler))
         register(Help(handler, commandExecutors))

@@ -27,11 +27,11 @@ class Help(
         try {
             val sm = SendMessage(message.from.id.toLong(), help.toString())
             handler.execute(sm)
-            if (!message.isUserMessage){
+            if (!message.isUserMessage) {
                 handler.sendMessage(message.chatId, "✅ Помощь отправлена вам в лс", message.messageId)
             }
-        } catch (e: TelegramApiException){
-            if (!message.isUserMessage){
+        } catch (e: TelegramApiException) {
+            if (!message.isUserMessage) {
                 handler.sendMessage(message.chatId, "Сначала напишите боту в лс!", message.messageId)
             }
         }

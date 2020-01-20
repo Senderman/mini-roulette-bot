@@ -19,14 +19,14 @@ class GiveMoney(private val handler: RouletteBotHandler) : CommandExecutor {
             message.text.split("\\s+".toRegex())[1].toInt()
         } catch (e: NumberFormatException) {
             return
-        } catch (e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             return
         }
         if (amount < 1) return
 
         val sender = message.from
         val receiver = message.replyToMessage.from
-        if (receiver.bot){
+        if (receiver.bot) {
             handler.sendMessage(chatId, "Но это же бот!", message.messageId)
             return
         }

@@ -82,7 +82,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             processZero()
         else
             processNonZero()
-        messagesToDelete.forEach{handler.deleteMessage(chatId, it)}
+        messagesToDelete.forEach { handler.deleteMessage(chatId, it) }
         handler.removeGame(this)
     }
 

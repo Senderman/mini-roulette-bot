@@ -5,7 +5,7 @@ import com.senderman.miniroulette.Services
 import com.senderman.neblib.CommandExecutor
 import org.telegram.telegrambots.meta.api.objects.Message
 
-class Balance(private val handler: RouletteBotHandler): CommandExecutor {
+class Balance(private val handler: RouletteBotHandler) : CommandExecutor {
     override val command: String
         get() = "/balance"
     override val desc: String
