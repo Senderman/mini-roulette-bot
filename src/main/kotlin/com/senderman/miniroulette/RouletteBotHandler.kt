@@ -36,7 +36,7 @@ class RouletteBotHandler : BotHandler(), MainHandler {
         val text = message.text
 
         // make bet
-        if (text.toLowerCase().matches("\\d+\\s+(:?ч(:?[её]рное)?|к(:?расное)?|\\d{1,2}(:?-\\d{1,2})?)".toRegex()) &&
+        if (text.toLowerCase().matches("\\d+\\s+(?:ч(?:[её]рное)?|к(?:расное)?|\\d{1,2}(:?-\\d{1,2})?)".toRegex()) &&
             containsGame(message.chatId)
         ) {
             getGame(message.chatId)!!.addBet(message.from.id, message.from.firstName, text, message.messageId)

@@ -14,7 +14,7 @@ import kotlin.concurrent.thread
 class QiwiPaymentsHandler(private val handler: MainHandler) {
     private val secretKey = System.getenv("qiwisecret")
     private val client = BillPaymentClientFactory.createDefault(secretKey)
-    val waitingFor = 15
+    val daysWaitingFor = 15L
     val checkInterval = 10L
 
     fun getPaymentFormUrl(user: TgUser, coins: Int, price: Double, billId: String): String {
@@ -27,7 +27,7 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
             billId,
             moneyAmount,
             "Донат в бота от ${user.name} на $coins монеток",
-            ZonedDateTime.now().plusDays(15),
+            ZonedDateTime.now().plusDays(daysWaitingFor),
             null,
             successUrl
         )
@@ -37,9 +37,8 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
     fun runBillChecking() = thread {
         while (true) {
             forLoop@ for (bill in Services.db.getWaitingBills()) {
-                val status = client.getBillInfo(bill.billId).status.value!!
 
-                when (status) {
+                when (client.getBillInfo(bill.billId).status.value!!) {
                     WAITING -> continue@forLoop
 
                     EXPIRED -> {
@@ -64,7 +63,7 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
                         )
                         handler.sendMessage(
                             Services.botConfig.mainAdmin.toLong(),
-                            "Поступил донат на ${bill.coins / 60} рублей от" +
+                            "Поступил донат на ${bill.coins / 60} рублей от " +
                                     "<a href=\"tg://user?id=${bill.userId}\">этого</a> юзера!"
                         )
                         Services.db.removeBill(bill.billId)

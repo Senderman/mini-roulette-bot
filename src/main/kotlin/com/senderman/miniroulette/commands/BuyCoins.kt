@@ -50,7 +50,7 @@ class BuyCoins(private val handler: RouletteBotHandler) : CommandExecutor {
         val paymentFormUrl = qiwi.getPaymentFormUrl(TgUser(message.from), amount, price, billId)
         Services.db.addWaitingBill(waitingBill)
         val text = """
-            В течение ${qiwi.waitingFor} дней вам нужно перейти по ссылке $paymentFormUrl и оплатить счет.
+            В течение ${qiwi.daysWaitingFor} дней вам нужно перейти по ссылке $paymentFormUrl и оплатить счет.
             Проверка оплаты выполняется каждые ${qiwi.checkInterval} минут.
             При изменении статуса платежа вы будете уведомлены в лс
         """.trimIndent()

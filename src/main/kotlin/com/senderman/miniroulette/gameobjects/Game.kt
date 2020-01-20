@@ -28,8 +28,8 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             handler.sendMessage(chatId, "Неверный формат!")
             return
         }
-        if (amount < 1) {
-            handler.sendMessage(chatId, "Ставка должна быть положительной!", messageId)
+        if (amount < 2) {
+            handler.sendMessage(chatId, "Ставка должна быть не меньше 2 монет!", messageId)
             return
         }
 
@@ -38,7 +38,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             return
         }
 
-        val target = text.trim().replace("^\\d+\\s+".toRegex(), "")
+        val target = text.trim().toLowerCase().replace("^\\d+\\s+".toRegex(), "")
         val bet = try {
             Bet.createBet(amount, target)
         } catch (e: InvalidBetCommandException) {
@@ -95,14 +95,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             var delta = 0
 
             for (bet in player.bets) {
-                val winBet = when (bet) {
-                    is Bet.Straight -> bet.target == 0
-                    is Bet.Split -> bet.first == 0
-                    is Bet.Trio -> bet.first == 0
-                    is Bet.Corner -> bet.first == 0
-                    is Bet.Color -> false
-                }
-                if (winBet) {
+                if (bet.isWin(currentCell)) {
                     profit = bet.pay + bet.amount
                     delta += bet.pay
                     text.appendln("\uD83D\uDE0E +${bet.pay} (${bet.amount} на ${bet.stringTarget})")
@@ -129,17 +122,7 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             var delta = 0
 
             for (bet in player.bets) {
-                val winBet = when (bet) {
-                    is Bet.Straight -> bet.target == currentCell
-                    is Bet.Split -> bet.first == currentCell || bet.second == currentCell
-                    is Bet.Trio -> bet.first <= currentCell && bet.last >= currentCell
-                    is Bet.Corner -> bet.first <= currentCell && bet.last >= currentCell
-                    is Bet.Color -> when (bet.color) {
-                        COLOR.BLACK -> currentCell.isEven()
-                        COLOR.RED -> currentCell.isOdd()
-                    }
-                }
-                if (winBet) {
+                if (bet.isWin(currentCell)) {
                     profit += bet.amount + bet.pay
                     delta += bet.pay
                     text.appendln("\uD83D\uDE0E +${bet.pay} (${bet.amount} на ${bet.stringTarget})")
@@ -156,7 +139,6 @@ class Game(private val handler: MainHandler, val chatId: Long) {
     }
 
     private fun Int.isEven() = this % 2 == 0
-    private fun Int.isOdd() = this % 2 != 0
     private fun formatDelta(delta: Int) = if (delta > 0) "\uD83D\uDCC8: +$delta" else "\uD83D\uDCC9: $delta"
 
     companion object {
