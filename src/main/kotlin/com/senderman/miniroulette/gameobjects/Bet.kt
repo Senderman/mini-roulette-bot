@@ -16,9 +16,14 @@ sealed class Bet(val amount: Int, val stringTarget: String) {
 
     class Color(amount: Int, private val color: COLOR) : Bet(amount, color.color) {
         override val coefficient = 1
-        override fun isWin(cell: Int) = cell.isEven() && color == COLOR.BLACK || !cell.isEven() && color == COLOR.RED
+        override fun isWin(cell: Int): Boolean {
+            if (cell == 0) return false
 
-        private fun Int.isEven() = this % 2 == 0
+            return when (cell % 2 == 0) {
+                true -> color == COLOR.BLACK
+                false -> color == COLOR.RED
+            }
+        }
 
         enum class COLOR(val color: String) {
             BLACK("черное"),
