@@ -26,7 +26,8 @@ dependencies {
     implementation 'com.annimon:tgbots-module:0.5'
     implementation 'org.mongodb:mongodb-driver-sync:3.12.0'
     implementation "com.github.Senderman:neb-lib:34e9035"
-    implementation 'com.qiwi:bill-payments-java-sdk:1.4.0'
+    implementation 'com.github.Senderman:bill-payments-java-sdk:8553030'
+    //implementation 'com.qiwi:bill-payments-java-sdk:1.4.0'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
