@@ -12,6 +12,7 @@ class MongoDBService : DBService {
     private val database: MongoDatabase = MongoClientKeeper.client.getDatabase("roulette")
     private val users: MongoCollection<Document> = database["users"]
     private val bills: MongoCollection<Document> = database["bills"]
+    private val chats: MongoCollection<Document> = database["chats"]
 
     private fun getUser(userId: Int): Document {
         val doc = users.find(eq("userId", userId)).first()
@@ -92,5 +93,20 @@ class MongoDBService : DBService {
 
     override fun removeBill(billId: String) {
         bills.deleteOne(eq("billId", billId))
+    }
+
+    override fun getLog(chatId: Long): String? {
+        val doc = chats.find(eq("chatId", chatId)).first() ?: return null
+        return doc.getString("log") ?: null
+    }
+
+    override fun setLog(chatId: Long, log: String) {
+        val commit = Document("log", log)
+        val doc = chats.find(eq("chatId", chatId)).first()
+        if (doc == null){
+            commit.append("chatId", chatId)
+            chats.insertOne(commit)
+        } else
+            chats.updateOne(eq("chatId", chatId), commit)
     }
 }

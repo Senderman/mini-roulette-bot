@@ -13,5 +13,6 @@ class ExecutorKeeper(handler: RouletteBotHandler) : AbstractExecutorKeeper() {
         register(GiveMoney(handler))
         register(BuyCoins(handler))
         register(Reward(handler))
+        register(Log(handler))
     }
 }

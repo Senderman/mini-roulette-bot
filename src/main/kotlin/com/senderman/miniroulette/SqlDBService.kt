@@ -108,5 +108,13 @@ class SqlDBService : DBService {
         )
     }
 
+    override fun getLog(chatId: Long): String? {
+        TODO("not implemented")
+    }
+
+    override fun setLog(chatId: Long, log: String) {
+        TODO("not implemented")
+    }
+
 
 }

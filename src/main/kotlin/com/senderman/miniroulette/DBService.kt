@@ -16,6 +16,9 @@ interface DBService {
     fun addWaitingBill(bill: WaitingBill)
     fun removeBill(billId: String)
 
+    fun getLog(chatId: Long) : String?
+    fun setLog(chatId: Long, log: String)
+
     companion object {
         const val startCoins: Int = 5000
     }

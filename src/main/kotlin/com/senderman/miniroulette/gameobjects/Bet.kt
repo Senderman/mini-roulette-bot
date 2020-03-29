@@ -86,19 +86,22 @@ sealed class Bet(val amount: Int, val stringTarget: String) {
         }
 
         private fun resolveBetType(target: String): Type = when {
-            target.matches("ч(?:[её]рное)?|к(расное)?".toRegex()) -> Type.COLORBET
+            target.matches("ч([её]рное)?|к(расное)?".toRegex()) -> Type.COLORBET
+
             target.matches("\\d+".toRegex()) -> {
                 val cell = target.toInt()
                 if (cell < 0 || cell > 12)
                     throw InvalidBetRangeException()
                 Type.STRAIGHT
             }
+
             target.matches("\\d+-\\d+".toRegex()) -> {
                 val params = target.split("-")
                 val first = params[0].toInt()
                 val second = params[1].toInt()
                 if (first < 0 || second > 12 || first >= second)
                     throw InvalidBetRangeException()
+
                 when (second - first) {
                     1 -> Type.SPLIT
                     2 -> Type.TRIO

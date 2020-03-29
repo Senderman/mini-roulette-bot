@@ -42,30 +42,39 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
                     WAITING -> continue@forLoop
 
                     EXPIRED -> {
-                        handler.sendMessage(
-                            bill.userId.toLong(),
-                            "Ожидание платежа за ${bill.coins} монет истекло!"
-                        )
+                        try {
+                            handler.sendMessage(
+                                bill.userId.toLong(),
+                                "Ожидание платежа за ${bill.coins} монет истекло!"
+                            )
+                        } catch (ignored: Exception) {
+                        }
                         Services.db.removeBill(bill.billId)
                     }
                     REJECTED -> {
-                        handler.sendMessage(
-                            bill.userId.toLong(),
-                            "Платеж за ${bill.coins} монет был отклонен!"
-                        )
+                        try {
+                            handler.sendMessage(
+                                bill.userId.toLong(),
+                                "Платеж за ${bill.coins} монет был отклонен!"
+                            )
+                        } catch (ignored: Exception) {
+                        }
                         Services.db.removeBill(bill.billId)
                     }
                     PAID -> {
                         Services.db.addCoins(bill.userId, bill.coins)
-                        handler.sendMessage(
-                            bill.userId.toLong(),
-                            "Платеж за ${bill.coins} монет выполнен! Приятной игры!"
-                        )
-                        handler.sendMessage(
-                            Services.botConfig.mainAdmin.toLong(),
-                            "Поступил донат на ${bill.coins / 60} рублей от " +
-                                    "<a href=\"tg://user?id=${bill.userId}\">этого</a> юзера!"
-                        )
+                        try {
+                            handler.sendMessage(
+                                bill.userId.toLong(),
+                                "Платеж за ${bill.coins} монет выполнен! Приятной игры!"
+                            )
+                            handler.sendMessage(
+                                Services.botConfig.mainAdmin.toLong(),
+                                "Поступил донат на ${bill.coins / 60} рублей от " +
+                                        "<a href=\"tg://user?id=${bill.userId}\">этого</a> юзера!"
+                            )
+                        } catch (ignored: Exception) {
+                        }
                         Services.db.removeBill(bill.billId)
                     }
                 }

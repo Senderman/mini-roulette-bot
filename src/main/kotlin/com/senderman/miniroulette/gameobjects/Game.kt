@@ -82,6 +82,16 @@ class Game(private val handler: MainHandler, val chatId: Long) {
             processZero()
         else
             processNonZero()
+
+        val logEntry: String = currentCell.toString() + when {
+            currentCell == 0 -> "💚"
+            currentCell.isEven() -> "\uD83D\uDDA4"
+            else -> "❤"
+        }
+        val log = Services.db.getLog(chatId) ?: ""
+        val finalLog = "$logEntry\n$log".lines().joinToString(separator = "\n", limit = 9, truncated = "")
+        Services.db.setLog(chatId, finalLog)
+
         messagesToDelete.forEach { handler.deleteMessage(chatId, it) }
         handler.removeGame(this)
     }
