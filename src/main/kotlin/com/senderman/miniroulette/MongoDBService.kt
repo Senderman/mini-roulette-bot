@@ -103,10 +103,11 @@ class MongoDBService : DBService {
     override fun setLog(chatId: Long, log: String) {
         val commit = Document("log", log)
         val doc = chats.find(eq("chatId", chatId)).first()
-        if (doc == null){
+        if (doc != null) {
+            chats.updateOne(eq("chatId", chatId), Document("\$set", commit))
+        } else {
             commit.append("chatId", chatId)
             chats.insertOne(commit)
-        } else
-            chats.updateOne(eq("chatId", chatId), commit)
+        }
     }
 }
