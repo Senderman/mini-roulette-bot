@@ -90,7 +90,8 @@ class Game(private val handler: MainHandler, val chatId: Long) {
         }
         val log = (Services.db.getLog(chatId) ?: "")
             .lines()
-            .joinToString(separator = "\n", limit = 9, truncated = "")
+            .takeLast(9)
+            .joinToString(separator = "\n", truncated = "")
             .trim()
         val finalLog = "$log\n$logEntry"
         Services.db.setLog(chatId, finalLog)
