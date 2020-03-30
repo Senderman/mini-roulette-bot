@@ -18,6 +18,6 @@ class Log(private val handler: RouletteBotHandler) : CommandExecutor {
             handler.sendMessage(chatId, "В этом чате пока еще не было игр!")
             return
         }
-        handler.sendMessage(chatId, "<b>Лог результатов</b> (ниже - новее)\n\n$log")
+        handler.sendMessage(chatId, "\uD83D\uDCC3<b>Лог результатов</b> (ниже - новее)\n$log")
     }
 }
