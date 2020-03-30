@@ -13,6 +13,11 @@ class Log(private val handler: RouletteBotHandler) : CommandExecutor {
 
     override fun execute(message: Message) {
         val chatId = message.chatId
-        handler.sendMessage(chatId, Services.db.getLog(chatId) ?: "В этом чате пока еще не было игр!")
+        val log = Services.db.getLog(chatId)
+        if (log == null) {
+            handler.sendMessage(chatId, "В этом чате пока еще не было игр!")
+            return
+        }
+        handler.sendMessage(chatId, "<b>Лог результатов</b> (ниже - новее)\n\n$log")
     }
 }
