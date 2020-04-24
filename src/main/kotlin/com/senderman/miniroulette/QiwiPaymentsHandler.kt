@@ -40,47 +40,53 @@ class QiwiPaymentsHandler(private val handler: MainHandler) {
 
                 when (client.getBillInfo(bill.billId).status.value!!) {
                     WAITING -> continue@forLoop
-
-                    EXPIRED -> {
-                        try {
-                            handler.sendMessage(
-                                bill.userId.toLong(),
-                                "Ожидание платежа за ${bill.coins} монет истекло!"
-                            )
-                        } catch (ignored: Exception) {
-                        }
-                        Services.db.removeBill(bill.billId)
-                    }
-                    REJECTED -> {
-                        try {
-                            handler.sendMessage(
-                                bill.userId.toLong(),
-                                "Платеж за ${bill.coins} монет был отклонен!"
-                            )
-                        } catch (ignored: Exception) {
-                        }
-                        Services.db.removeBill(bill.billId)
-                    }
-                    PAID -> {
-                        Services.db.addCoins(bill.userId, bill.coins)
-                        try {
-                            handler.sendMessage(
-                                bill.userId.toLong(),
-                                "Платеж за ${bill.coins} монет выполнен! Приятной игры!"
-                            )
-                            handler.sendMessage(
-                                Services.botConfig.mainAdmin.toLong(),
-                                "Поступил донат на ${bill.coins / 60} рублей от " +
-                                        "<a href=\"tg://user?id=${bill.userId}\">этого</a> юзера!"
-                            )
-                        } catch (ignored: Exception) {
-                        }
-                        Services.db.removeBill(bill.billId)
-                    }
+                    EXPIRED -> processExpiredBill(bill)
+                    REJECTED -> processRejectedBill(bill)
+                    PAID -> processPaidBill(bill)
                 }
                 Thread.sleep(TimeUnit.SECONDS.toMillis(2))
+
             }
             Thread.sleep(TimeUnit.MINUTES.toMillis(checkInterval))
         }
+    }
+
+    private fun processPaidBill(bill: WaitingBill) {
+        Services.db.addCoins(bill.userId, bill.coins)
+        try {
+            handler.sendMessage(
+                bill.userId.toLong(),
+                "Платеж за ${bill.coins} монет выполнен! Приятной игры!"
+            )
+            handler.sendMessage(
+                Services.botConfig.mainAdmin.toLong(),
+                "Поступил донат на ${bill.coins / 60} рублей от " +
+                        "<a href=\"tg://user?id=${bill.userId}\">этого</a> юзера!"
+            )
+        } catch (ignored: Exception) {
+        }
+        Services.db.removeBill(bill.billId)
+    }
+
+    private fun processExpiredBill(bill: WaitingBill) {
+        try {
+            handler.sendMessage(
+                bill.userId.toLong(),
+                "Ожидание платежа за ${bill.coins} монет истекло!"
+            )
+        } catch (ignored: Exception) {
+        }
+        Services.db.removeBill(bill.billId)
+    }
+
+    private fun processRejectedBill(bill: WaitingBill) {
+        try {
+            handler.sendMessage(
+                bill.userId.toLong(),
+                "Платеж за ${bill.coins} монет был отклонен!"
+            )
+        } catch (ignored: Exception) {
+        }
+        Services.db.removeBill(bill.billId)
     }
 }
