@@ -21,6 +21,7 @@ class MongoDBService : DBService {
                 .append("coins", DBService.startCoins)
                 .append("lastReqDate", 0)
                 .append("last10requestDate", 0)
+                .append("_class", "com.senderman.rouletteapi.model.User")
             users.insertOne(commit)
             return commit
         }
