@@ -1,47 +1,54 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
-    id 'java'
-    id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("io.micronaut.application") version "3.7.3"
 }
 
 group 'com.senderman'
 version '1.0'
-mainClassName = 'com.annimon.tgbotsmodule.Runner'
 
-sourceCompatibility = 13
-
-allprojects {
-    repositories {
-        maven { url "https://jitpack.io" }
-        mavenCentral()
-    }
-}
-
-test {
-    useJUnitPlatform()
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-    implementation 'com.annimon:tgbots-module:0.9'
-    implementation 'org.mongodb:mongodb-driver-sync:4.0.2'
-    implementation "com.github.Senderman:neb-lib:34e9035"
-    implementation 'com.qiwi:bill-payments-java-sdk:1.5.0'
+    implementation('com.annimon:tgbots-module:6.5.1') {
+        exclude group: 'org.glassfish.grizzly', module: 'grizzly-http-server'
+        exclude group: 'org.glassfish.jersey.core', module: 'jersey-server'
+    }
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("io.micronaut:micronaut-jackson-databind")
 
+    //annotationProcessor("io.micronaut.micrometer:micronaut-micrometer-annotation")
+    implementation("io.micronaut:micronaut-management")
+    /*implementation("io.micronaut.micrometer:micronaut-micrometer-core")
+    implementation("io.micronaut.micrometer:micronaut-micrometer-registry-prometheus")*/
+
+    annotationProcessor("io.micronaut.data:micronaut-data-document-processor")
+    implementation("io.micronaut.data:micronaut-data-mongodb")
+    runtimeOnly("org.mongodb:mongodb-driver-sync")
+
+    runtimeOnly("ch.qos.logback:logback-classic:1.4.5")
 }
 
-shadowJar {
-    mergeServiceFiles()
+application {
+    mainClass.set("com.senderman.miniroulette.MiniRouletteBot")
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
 }
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    // runtime 'netty'
+    processing {
+        incremental(true)
+        annotations("com.senderman.miniroulette.*")
+    }
 }
