@@ -1,22 +1,17 @@
 package com.senderman.miniroulette.model.bet;
 
-import com.annimon.tgbotsmodule.commands.context.MessageContext;
 import com.senderman.miniroulette.exception.InvalidBetCommandException;
 import com.senderman.miniroulette.exception.InvalidBetRangeException;
-import com.senderman.miniroulette.model.Player;
-import com.senderman.miniroulette.util.Html;
 
 public sealed abstract class Bet permits StraightBet, ColorBet, RangeBet {
 
     private final int coefficient; // depends on the type of the bet
     private final int amount; // how much money at stake
-    private final Player player; // owner of the bet
     private final String targetAsString; // string representation of the target cell, used in output
 
-    public Bet(int coefficient, int amount, Player player, String targetAsString) {
+    public Bet(int coefficient, int amount, String targetAsString) {
         this.coefficient = coefficient;
         this.amount = amount;
-        this.player = player;
         this.targetAsString = targetAsString;
     }
 
@@ -34,16 +29,12 @@ public sealed abstract class Bet permits StraightBet, ColorBet, RangeBet {
         return amount;
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
     public String getTargetAsString() {
         return targetAsString;
     }
 
-    private Bet parseBet(MessageContext ctx) throws InvalidBetRangeException, InvalidBetCommandException {
-        final String[] params = ctx.message().getText().split("\\s+");
+    private Bet parseBet(String text) throws InvalidBetRangeException, InvalidBetCommandException {
+        final String[] params = text.split("\\s+");
         if (params.length != 2)
             throw new InvalidBetCommandException();
 
@@ -54,19 +45,18 @@ public sealed abstract class Bet permits StraightBet, ColorBet, RangeBet {
             throw new InvalidBetCommandException();
         }
 
-        final var player = new Player(ctx.user().getId(), Html.htmlSafe(ctx.user().getFirstName()));
         final var target = params[1];
 
         if (target.matches("ч([её]рное)?|к(расное)?")) {
             ColorBet.Color color = (target.charAt(0) == 'ч') ? ColorBet.Color.BLACK : ColorBet.Color.RED;
-            return new ColorBet(amount, player, color);
+            return new ColorBet(amount, color);
         }
 
         if (target.matches("\\d+")) {
             int cell = Integer.parseInt(target);
             if (cell < 0 || cell > 12)
                 throw new InvalidBetRangeException();
-            return new StraightBet(cell, amount, player);
+            return new StraightBet(cell, amount);
         }
 
         if (target.matches("\\d+-\\d+")) {
@@ -77,9 +67,9 @@ public sealed abstract class Bet permits StraightBet, ColorBet, RangeBet {
                 throw new InvalidBetRangeException();
 
             return switch (last - first) {
-                case 1 -> new RangeBet.Split(amount, player, first, last);
-                case 2 -> new RangeBet.Trio(amount, player, first, last);
-                case 3 -> new RangeBet.Corner(amount, player, first, last);
+                case 1 -> new RangeBet.Split(amount, first, last);
+                case 2 -> new RangeBet.Trio(amount, first, last);
+                case 3 -> new RangeBet.Corner(amount, first, last);
                 default -> throw new InvalidBetRangeException();
             };
         }

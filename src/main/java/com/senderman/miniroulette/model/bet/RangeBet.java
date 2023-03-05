@@ -1,14 +1,12 @@
 package com.senderman.miniroulette.model.bet;
 
-import com.senderman.miniroulette.model.Player;
-
 sealed abstract class RangeBet extends Bet {
 
     private final int first;
     private final int last;
 
-    RangeBet(int coefficient, int amount, Player player, int first, int last) {
-        super(coefficient, amount, player, "%d-%s".formatted(first, last));
+    RangeBet(int coefficient, int amount, int first, int last) {
+        super(coefficient, amount, "%d-%s".formatted(first, last));
         this.first = first;
         this.last = last;
     }
@@ -20,22 +18,22 @@ sealed abstract class RangeBet extends Bet {
 
     static final class Split extends RangeBet {
 
-        public Split(int amount, Player player, int first, int last) {
-            super(5, amount, player, first, last);
+        public Split(int amount, int first, int last) {
+            super(5, amount, first, last);
         }
     }
 
     static final class Trio extends RangeBet {
 
-        public Trio(int amount, Player player, int first, int last) {
-            super(3, amount, player, first, last);
+        public Trio(int amount, int first, int last) {
+            super(3, amount, first, last);
         }
     }
 
     static final class Corner extends RangeBet {
 
-        public Corner(int amount, Player player, int first, int last) {
-            super(2, amount, player, first, last);
+        public Corner(int amount, int first, int last) {
+            super(2, amount, first, last);
         }
     }
 }

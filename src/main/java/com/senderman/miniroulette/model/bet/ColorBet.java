@@ -1,13 +1,11 @@
 package com.senderman.miniroulette.model.bet;
 
-import com.senderman.miniroulette.model.Player;
-
 final class ColorBet extends Bet {
 
     private final Color color;
 
-    ColorBet(int amount, Player player, Color color) {
-        super(1, amount, player, color.target);
+    ColorBet(int amount, Color color) {
+        super(1, amount, color.target);
         this.color = color;
     }
 
