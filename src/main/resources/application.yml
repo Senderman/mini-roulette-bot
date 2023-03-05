@@ -1,0 +1,48 @@
+micronaut:
+  application:
+    name: MiniRoulette
+  server:
+    port: 1458
+  metrics:
+    enabled: false
+    export:
+      prometheus:
+        enabled: false
+        descriptions: true
+        step: PT1M
+
+endpoints:
+  prometheus:
+    enabled: false
+    sensitive: false
+
+# you can also use unix domain socket connection:
+
+# mongodb:
+#  uri: mongodb://user:password@%2Ftmp%2Fmongodb-27017.sock/database?directConnection=true&authSource=admin
+
+mongodb:
+  uri: "mongodb://user:password@host:port/database?directConnection=true&authSource=admin"
+
+netty:
+  default:
+    allocator:
+      max-order: 3
+
+bot:
+  username: ${BOT_USERNAME} # bot username without @
+  token: ${BOT_TOKEN} # bot token
+  creator-id: ${creator-id} # userId of the creator of the bot (or of the admin if you wish)
+  help: |
+    Для начала игры необходимо отправить команду /rourun, далее игрокам дается 30 секунд на совершение ставок
+    Ставку надо делать в формате "X target", где Х - кол-во денег, которые игрок готов поставить, а target - цель. Цели могут быть следующими:
+    
+    Число от 0 до 12 (напр. 40 4) - прямая ставка, выплата 11 к 1
+    Диапазон 2х чисел (1000 2-3) - ставка "сплит", выплата 5 к 1
+    Диапазон 3х чисел - ставка "трио", выплата 3 к 1
+    Диапазон 4х чисел (X 4-7) - ставка "уголок", выплата 2 к 1
+    ч[её]рное/красное/ч/к (без учета регистра) - ставка на цвет, выплата 1 к 1
+    
+    Ставок можно делать сколько угодно, пока есть деньги
+    Рулетка начинает крутиться после 30 секунд с момента последней ставки
+    Бот умеет чистить спам за собой, для этого дайте ему права на удаление сообщений

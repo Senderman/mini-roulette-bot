@@ -8,11 +8,12 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.runtime.ApplicationConfiguration;
 import io.micronaut.runtime.EmbeddedApplication;
 import io.micronaut.runtime.Micronaut;
-import io.micronaut.scheduling.annotation.Scheduled;
+import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@Singleton
 public class MiniRouletteBot implements EmbeddedApplication<MiniRouletteBot>, BotModule {
 
     private final ApplicationContext context;
@@ -34,14 +35,22 @@ public class MiniRouletteBot implements EmbeddedApplication<MiniRouletteBot>, Bo
                         "BOT_TOKEN",
                         "MICRONAUT_APPLICATION_SERVER_HOST",
                         "MICRONAUT_APPLICATION_SERVER_PORT",
-                        "MICRONAUT_METRICS_ENABLED"
+                        "MICRONAUT_METRICS_ENABLED",
+                        "creator-id"
                 )
                 .start();
     }
 
-    @Scheduled(initialDelay = "1s")
-    protected void runBot() {
-        new Thread(() -> Runner.run(List.of(this))).start();
+//    @Scheduled(initialDelay = "1s")
+//    protected void runBot() {
+//        new Thread(() -> Runner.run(List.of(this))).start();
+//    }
+
+
+    @Override
+    public @NotNull MiniRouletteBot start() {
+        Runner.run(List.of(this));
+        return this;
     }
 
     @Override
@@ -68,4 +77,6 @@ public class MiniRouletteBot implements EmbeddedApplication<MiniRouletteBot>, Bo
     public boolean isRunning() {
         return true;
     }
+
+
 }

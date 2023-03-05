@@ -11,4 +11,6 @@ public interface BotConfig {
 
     String getHelp();
 
+    long getCreatorId();
+
 }
