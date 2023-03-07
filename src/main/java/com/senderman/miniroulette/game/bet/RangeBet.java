@@ -1,4 +1,4 @@
-package com.senderman.miniroulette.model.bet;
+package com.senderman.miniroulette.game.bet;
 
 sealed abstract class RangeBet extends Bet {
 

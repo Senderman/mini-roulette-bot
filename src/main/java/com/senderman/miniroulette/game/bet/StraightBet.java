@@ -1,4 +1,4 @@
-package com.senderman.miniroulette.model.bet;
+package com.senderman.miniroulette.game.bet;
 
 final class StraightBet extends Bet {
 

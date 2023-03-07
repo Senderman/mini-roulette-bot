@@ -1,34 +1,35 @@
-package com.senderman.miniroulette;
+package com.senderman.miniroulette.game;
 
-import com.senderman.miniroulette.exception.NotEnoughCoinsException;
 import com.senderman.miniroulette.exception.TooLateException;
-import com.senderman.miniroulette.model.Player;
-import com.senderman.miniroulette.model.bet.Bet;
+import com.senderman.miniroulette.exception.TooLittleCoinsException;
+import com.senderman.miniroulette.game.bet.Bet;
 import io.micronaut.core.annotation.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class Game {
+public class Game<ID> {
 
     public final static int MAX_WAIT_TIME_SECONDS = 30;
 
-    private final long id;
+    private final ID id;
     @Nullable
-    private final Consumer<Game> onSpin;
+    private final Consumer<Game<ID>> onSpin;
     @Nullable
-    private final Consumer<Game> onGameEnd;
+    private final Consumer<Game<ID>> onGameEnd;
     private final Map<Long, Player> players; // players by id;
     private final AtomicInteger timer;
     private boolean isOpenForBets;
     @Nullable
     private Integer currentCell;
 
-    public Game(long id, @Nullable Consumer<Game> onSpin, @Nullable Consumer<Game> onGameEnd) {
+    public Game(ID id, @Nullable Consumer<Game<ID>> onSpin, @Nullable Consumer<Game<ID>> onGameEnd) {
         this.id = id;
         this.onSpin = onSpin;
         this.onGameEnd = onGameEnd;
@@ -36,14 +37,17 @@ public class Game {
         this.timer = new AtomicInteger(0);
         isOpenForBets = true;
         currentCell = null;
+        runTimer();
     }
 
-    public synchronized void addBet(Player player, Bet bet) throws TooLateException, NotEnoughCoinsException {
+    public synchronized void addBet(Player player, Bet bet) throws TooLateException, TooLittleCoinsException {
         if (!isOpenForBets)
             throw new TooLateException();
 
         if (bet.getAmount() < 2)
-            throw new NotEnoughCoinsException();
+            throw new TooLittleCoinsException();
+
+        resetTimer();
 
         if (players.containsKey(player.getId()))
             players.get(player.getId()).addBet(bet);
@@ -54,17 +58,17 @@ public class Game {
     }
 
     private void runTimer() {
-        new Thread(() -> {
+        ForkJoinPool.commonPool().execute(() -> {
             while (timer.get() < MAX_WAIT_TIME_SECONDS) {
                 timer.incrementAndGet();
                 try {
-                    Thread.sleep(1000);
+                    TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
             spin();
-        }).start();
+        });
     }
 
     private synchronized void spin() {
@@ -109,7 +113,7 @@ public class Game {
                     income += bet.getPay() + bet.getAmount();
                     delta += bet.getPay();
                 } else {
-                    income += bet.getAmount() / 2;
+                    income -= bet.getAmount() / 2;
                     delta -= bet.getAmount() / 2;
                 }
             }
@@ -118,16 +122,16 @@ public class Game {
         }
     }
 
-    public long getId() {
+    private void resetTimer() {
+        timer.set(0);
+    }
+
+    public ID getId() {
         return id;
     }
 
     public Collection<Player> getPlayers() {
         return players.values();
-    }
-
-    public AtomicInteger getTimer() {
-        return timer;
     }
 
     @Nullable

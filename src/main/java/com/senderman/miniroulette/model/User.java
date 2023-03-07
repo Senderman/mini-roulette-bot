@@ -12,13 +12,15 @@ public class User {
     @Id
     private final long userId;
     private int coins;
+    private int pendingCoins; // coins invested in current games
     private int lastCoinRequestDate;
     private int last10CoinRequestDate;
 
     @Creator
-    public User(@Id long userId, int coins, int lastCoinRequestDate, int last10CoinRequestDate) {
+    public User(@Id long userId, int coins, int pendingCoins, int lastCoinRequestDate, int last10CoinRequestDate) {
         this.userId = userId;
         this.coins = coins;
+        this.pendingCoins = pendingCoins;
         this.lastCoinRequestDate = lastCoinRequestDate;
         this.last10CoinRequestDate = last10CoinRequestDate;
     }
@@ -33,6 +35,14 @@ public class User {
 
     public void setCoins(int coins) {
         this.coins = coins;
+    }
+
+    public int getPendingCoins() {
+        return pendingCoins;
+    }
+
+    public void setPendingCoins(int pendingCoins) {
+        this.pendingCoins = pendingCoins;
     }
 
     public int getLastCoinRequestDate() {

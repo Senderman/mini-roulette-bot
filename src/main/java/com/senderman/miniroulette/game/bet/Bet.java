@@ -1,4 +1,4 @@
-package com.senderman.miniroulette.model.bet;
+package com.senderman.miniroulette.game.bet;
 
 import com.senderman.miniroulette.exception.InvalidBetCommandException;
 import com.senderman.miniroulette.exception.InvalidBetRangeException;
@@ -33,7 +33,7 @@ public sealed abstract class Bet permits StraightBet, ColorBet, RangeBet {
         return targetAsString;
     }
 
-    private Bet parseBet(String text) throws InvalidBetRangeException, InvalidBetCommandException {
+    public static Bet parseBet(String text) throws InvalidBetRangeException, InvalidBetCommandException {
         final String[] params = text.split("\\s+");
         if (params.length != 2)
             throw new InvalidBetCommandException();

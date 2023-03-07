@@ -1,6 +1,6 @@
-package com.senderman.miniroulette.model;
+package com.senderman.miniroulette.game;
 
-import com.senderman.miniroulette.model.bet.Bet;
+import com.senderman.miniroulette.game.bet.Bet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ public class Player {
     private final long id;
     private final String name;
     private final List<Bet> bets;
-    private int income;
+    private int income; // delta + bet
     private int delta;
 
     public Player(long id, String name) {

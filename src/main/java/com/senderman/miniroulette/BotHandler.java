@@ -2,6 +2,7 @@ package com.senderman.miniroulette;
 
 import com.annimon.tgbotsmodule.analytics.UpdateHandler;
 import com.senderman.miniroulette.confg.BotConfig;
+import com.senderman.miniroulette.service.UserService;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -17,11 +18,13 @@ public class BotHandler extends com.annimon.tgbotsmodule.BotHandler {
     private final BotConfig config;
     private final UpdateHandler updateHandler;
     private final Set<Long> telegramServiceUserIds;
+    private final UserService userService;
 
-    public BotHandler(@NotNull DefaultBotOptions options, BotConfig config, UpdateHandler updateHandler) {
+    public BotHandler(@NotNull DefaultBotOptions options, BotConfig config, UpdateHandler updateHandler, UserService userService) {
         super(options, config.getToken());
         this.config = config;
         this.updateHandler = updateHandler;
+        this.userService = userService;
         this.telegramServiceUserIds = Set.of(
                 777000L, // attached channel's messages
                 1087968824L, // anonymous group admin @GroupAnonymousBot
@@ -29,6 +32,7 @@ public class BotHandler extends com.annimon.tgbotsmodule.BotHandler {
         );
 
         addMethodPreprocessor(SendMessage.class, m -> m.enableHtml(true));
+        userService.restoreLostCoins();
     }
 
     @Override

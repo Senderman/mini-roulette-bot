@@ -2,10 +2,11 @@ package com.senderman.miniroulette.confg;
 
 import com.annimon.tgbotsmodule.analytics.UpdateHandler;
 import com.annimon.tgbotsmodule.commands.CommandRegistry;
+import com.annimon.tgbotsmodule.commands.RegexCommand;
+import com.annimon.tgbotsmodule.commands.TextCommand;
 import com.annimon.tgbotsmodule.commands.authority.Authority;
 import com.annimon.tgbotsmodule.commands.authority.For;
 import com.annimon.tgbotsmodule.commands.authority.SimpleAuthority;
-import com.senderman.miniroulette.command.CommandExecutor;
 import io.micronaut.context.annotation.Factory;
 import jakarta.inject.Singleton;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -28,9 +29,15 @@ public class Beans {
     }
 
     @Singleton
-    public UpdateHandler commandRegistry(BotConfig config, Authority<For> authority, List<CommandExecutor> executors) {
+    public UpdateHandler commandRegistry(
+            BotConfig config,
+            Authority<For> authority,
+            List<TextCommand> textCommands,
+            List<RegexCommand> regexCommands
+    ) {
         var registry = new CommandRegistry<>(config.getUsername(), authority);
-        executors.forEach(registry::register);
+        textCommands.forEach(registry::register);
+        regexCommands.forEach(registry::register);
         return registry;
     }
 
