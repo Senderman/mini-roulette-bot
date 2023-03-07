@@ -2,6 +2,7 @@ package com.senderman.miniroulette.service;
 
 import com.senderman.miniroulette.model.User;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface UserService {
@@ -12,7 +13,7 @@ public interface UserService {
 
     User save(User user);
 
-    Iterable<User> saveAll(Iterable<User> users);
+    Iterable<User> saveAll(Collection<User> users);
 
     List<User> findByPendingCoinsNotEquals(int pendingCoins);
 

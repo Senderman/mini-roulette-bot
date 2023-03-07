@@ -4,6 +4,7 @@ import com.senderman.miniroulette.model.User;
 import com.senderman.miniroulette.repository.UserRepository;
 import jakarta.inject.Singleton;
 
+import java.util.Collection;
 import java.util.List;
 
 @Singleton
@@ -26,7 +27,9 @@ public class MongoUserService implements UserService {
     }
 
     @Override
-    public Iterable<User> saveAll(Iterable<User> users) {
+    public Iterable<User> saveAll(Collection<User> users) {
+        if (users.isEmpty())
+            return users;
         return repo.updateAll(users);
     }
 
