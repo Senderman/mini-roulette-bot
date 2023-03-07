@@ -11,6 +11,7 @@ import com.senderman.miniroulette.game.GameManager;
 import com.senderman.miniroulette.game.Player;
 import com.senderman.miniroulette.game.TelegramGameProxy;
 import com.senderman.miniroulette.game.bet.Bet;
+import com.senderman.miniroulette.model.User;
 import com.senderman.miniroulette.service.UserService;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
@@ -49,21 +50,26 @@ public class BetRegexCommand implements RegexCommand {
             return;
 
         deleteLater(game, ctx.message());
+        var from = ctx.message().getFrom();
+        var user = userService.findById(from.getId());
         final Bet bet;
         try {
             bet = Bet.parseBet(ctx.message().getText());
+            if (bet.getAmount() > user.getCoins()) {
+                deleteLater(game, ctx.replyToMessage("У вас недостаточно монет!").call(ctx.sender));
+                return;
+            }
         } catch (InvalidBetRangeException e) {
             deleteLater(game, ctx.replyToMessage("Неверный дипазон ставки!").call(ctx.sender));
             return;
         } catch (InvalidBetCommandException ignored) {
             return;
         }
-        var from = ctx.message().getFrom();
         var player = new Player(from.getId(), from.getFirstName());
         try {
             game.addBet(player, bet);
             deleteLater(game, ctx.replyToMessage("Ставка принята!").call(ctx.sender));
-            pendCoins(player.getId(), bet.getAmount());
+            pendCoins(user, bet.getAmount());
         } catch (TooLateException e) {
             deleteLater(game, ctx.replyToMessage("Слишком поздно! Ставки больше не принимаются!").call(ctx.sender));
         } catch (TooLittleCoinsException e) {
@@ -71,8 +77,7 @@ public class BetRegexCommand implements RegexCommand {
         }
     }
 
-    private void pendCoins(long userId, int amount) {
-        var user = userService.findById(userId);
+    private void pendCoins(User user, int amount) {
         user.setPendingCoins(user.getPendingCoins() + amount);
         user.setCoins(user.getCoins() - amount);
         userService.save(user);
