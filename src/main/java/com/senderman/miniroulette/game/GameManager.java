@@ -2,7 +2,7 @@ package com.senderman.miniroulette.game;
 
 import io.micronaut.core.annotation.Nullable;
 
-public interface GameManager<ID> {
+public interface GameManager<ID, T extends Game<ID>> {
 
     /**
      * Get game by id
@@ -11,14 +11,14 @@ public interface GameManager<ID> {
      * @return game, or null if doesn't exist
      */
     @Nullable
-    Game<ID> get(long id);
+    T get(long id);
 
     /**
      * Save a new game. If game with the given id exists, do nothing
      *
      * @param game game to save
      */
-    void save(Game<ID> game);
+    void save(T game);
 
     /**
      * Check if game exists by id

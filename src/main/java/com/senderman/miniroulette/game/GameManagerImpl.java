@@ -6,21 +6,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
-public class GameManagerImpl<ID> implements GameManager<ID> {
+public class GameManagerImpl<ID, T extends Game<ID>> implements GameManager<ID, T> {
 
-    private final Map<ID, Game<ID>> games;
+    private final Map<ID, T> games;
 
     public GameManagerImpl() {
         this.games = new ConcurrentHashMap<>();
     }
 
     @Override
-    synchronized public Game<ID> get(long id) {
+    synchronized public T get(long id) {
         return games.get(id);
     }
 
     @Override
-    synchronized public void save(Game<ID> game) {
+    synchronized public void save(T game) {
         if (!games.containsKey(game.getId()))
             games.put(game.getId(), game);
     }

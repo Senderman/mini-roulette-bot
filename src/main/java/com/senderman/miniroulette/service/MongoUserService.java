@@ -17,7 +17,7 @@ public class MongoUserService implements UserService {
 
     @Override
     public User findById(long id) {
-        return repo.findById(id).orElseGet(() -> new User(id, INITIAL_COINS_QUANTIY, 0, 0, 0));
+        return repo.findById(id).orElseGet(() -> new User(id, "Без имени", INITIAL_COINS_QUANTIY, 0, 0));
     }
 
     @Override
@@ -33,5 +33,10 @@ public class MongoUserService implements UserService {
     @Override
     public List<User> findByPendingCoinsNotEquals(int pendingCoins) {
         return repo.findByPendingCoinsNotEquals(pendingCoins);
+    }
+
+    @Override
+    public List<User> findTop10OrderByCoinsDesc() {
+        return repo.findTop10OrderByCoinsDesc();
     }
 }

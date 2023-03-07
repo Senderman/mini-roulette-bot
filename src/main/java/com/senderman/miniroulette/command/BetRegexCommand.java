@@ -9,10 +9,12 @@ import com.senderman.miniroulette.exception.TooLateException;
 import com.senderman.miniroulette.exception.TooLittleCoinsException;
 import com.senderman.miniroulette.game.GameManager;
 import com.senderman.miniroulette.game.Player;
+import com.senderman.miniroulette.game.TelegramGameProxy;
 import com.senderman.miniroulette.game.bet.Bet;
 import com.senderman.miniroulette.service.UserService;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.EnumSet;
 import java.util.regex.Pattern;
@@ -21,10 +23,10 @@ import java.util.regex.Pattern;
 public class BetRegexCommand implements RegexCommand {
 
     private final Pattern pattern = Pattern.compile("\\d+\\s+(?:ч(?:[её]рное)?|к(?:расное)?|\\d{1,2}(:?-\\d{1,2})?)");
-    private final GameManager<Long> gameManager;
+    private final GameManager<Long, TelegramGameProxy> gameManager;
     private final UserService userService;
 
-    public BetRegexCommand(GameManager<Long> gameManager, UserService userService) {
+    public BetRegexCommand(GameManager<Long, TelegramGameProxy> gameManager, UserService userService) {
         this.gameManager = gameManager;
         this.userService = userService;
 
@@ -46,11 +48,12 @@ public class BetRegexCommand implements RegexCommand {
         if (game == null)
             return;
 
+        deleteLater(game, ctx.message());
         final Bet bet;
         try {
             bet = Bet.parseBet(ctx.message().getText());
         } catch (InvalidBetRangeException e) {
-            ctx.replyToMessage("Неверный дипазон ставки!").callAsync(ctx.sender);
+            deleteLater(game, ctx.replyToMessage("Неверный дипазон ставки!").call(ctx.sender));
             return;
         } catch (InvalidBetCommandException ignored) {
             return;
@@ -58,16 +61,24 @@ public class BetRegexCommand implements RegexCommand {
         var from = ctx.message().getFrom();
         var player = new Player(from.getId(), from.getFirstName());
         try {
-            var user = userService.findById(player.getId());
-            user.setPendingCoins(user.getPendingCoins() + bet.getAmount());
-            user.setCoins(user.getCoins() - bet.getAmount());
-            userService.save(user);
             game.addBet(player, bet);
-            ctx.replyToMessage("Ставка принята!").callAsync(ctx.sender);
+            deleteLater(game, ctx.replyToMessage("Ставка принята!").call(ctx.sender));
+            pendCoins(player.getId(), bet.getAmount());
         } catch (TooLateException e) {
-            ctx.replyToMessage("Слишком поздно! Ставки больше не принимаются!").callAsync(ctx.sender);
+            deleteLater(game, ctx.replyToMessage("Слишком поздно! Ставки больше не принимаются!").call(ctx.sender));
         } catch (TooLittleCoinsException e) {
-            ctx.replyToMessage("Минимальная ставка - 2!").callAsync(ctx.sender);
+            deleteLater(game, ctx.replyToMessage("Минимальная ставка - 2!").call(ctx.sender));
         }
+    }
+
+    private void pendCoins(long userId, int amount) {
+        var user = userService.findById(userId);
+        user.setPendingCoins(user.getPendingCoins() + amount);
+        user.setCoins(user.getCoins() - amount);
+        userService.save(user);
+    }
+
+    private void deleteLater(TelegramGameProxy game, Message message) {
+        game.addMessageToDelete(message.getMessageId());
     }
 }

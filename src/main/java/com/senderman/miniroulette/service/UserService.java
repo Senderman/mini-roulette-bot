@@ -16,6 +16,8 @@ public interface UserService {
 
     List<User> findByPendingCoinsNotEquals(int pendingCoins);
 
+    List<User> findTop10OrderByCoinsDesc();
+
     default void restoreLostCoins() {
         var users = findByPendingCoinsNotEquals(0);
         if (users.isEmpty())

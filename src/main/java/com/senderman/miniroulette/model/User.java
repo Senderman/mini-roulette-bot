@@ -11,22 +11,30 @@ public class User {
 
     @Id
     private final long userId;
+    private String name;
     private int coins;
     private int pendingCoins; // coins invested in current games
     private int lastCoinRequestDate;
-    private int last10CoinRequestDate;
 
     @Creator
-    public User(@Id long userId, int coins, int pendingCoins, int lastCoinRequestDate, int last10CoinRequestDate) {
+    public User(@Id long userId, String name, int coins, int pendingCoins, int lastCoinRequestDate) {
         this.userId = userId;
+        this.name = name;
         this.coins = coins;
         this.pendingCoins = pendingCoins;
         this.lastCoinRequestDate = lastCoinRequestDate;
-        this.last10CoinRequestDate = last10CoinRequestDate;
     }
 
     public long getUserId() {
         return userId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getCoins() {
@@ -51,14 +59,6 @@ public class User {
 
     public void setLastCoinRequestDate(int lastCoinRequestDate) {
         this.lastCoinRequestDate = lastCoinRequestDate;
-    }
-
-    public int getLast10CoinRequestDate() {
-        return last10CoinRequestDate;
-    }
-
-    public void setLast10CoinRequestDate(int last10CoinRequestDate) {
-        this.last10CoinRequestDate = last10CoinRequestDate;
     }
 
     @Override
