@@ -9,6 +9,7 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Set;
 
@@ -18,13 +19,11 @@ public class BotHandler extends com.annimon.tgbotsmodule.BotHandler {
     private final BotConfig config;
     private final UpdateHandler updateHandler;
     private final Set<Long> telegramServiceUserIds;
-    private final UserService userService;
 
     public BotHandler(@NotNull DefaultBotOptions options, BotConfig config, UpdateHandler updateHandler, UserService userService) {
         super(options, config.getToken());
         this.config = config;
         this.updateHandler = updateHandler;
-        this.userService = userService;
         this.telegramServiceUserIds = Set.of(
                 777000L, // attached channel's messages
                 1087968824L, // anonymous group admin @GroupAnonymousBot
@@ -55,5 +54,10 @@ public class BotHandler extends com.annimon.tgbotsmodule.BotHandler {
     @Override
     public String getBotUsername() {
         return config.getUsername();
+    }
+
+    @Override
+    public void handleTelegramApiException(TelegramApiException ex) {
+        // enable only if really needed
     }
 }
