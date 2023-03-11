@@ -76,35 +76,28 @@ public class Game<ID> {
 
     protected void processNonZero(int cell) {
         for (var player : getPlayers()) {
-            int income = 0;
             int delta = 0;
             for (var bet : player.getBets()) {
                 if (bet.isWin(cell)) {
-                    income += bet.getPay() + bet.getAmount();
                     delta += bet.getPay();
                 } else {
                     delta -= bet.getAmount();
                 }
             }
-            player.setIncome(income);
             player.setDelta(delta);
         }
     }
 
     protected void processZero() {
         for (var player : getPlayers()) {
-            int income = 0;
             int delta = 0;
             for (var bet : player.getBets()) {
                 if (bet.isWin(0)) {
-                    income += bet.getPay() + bet.getAmount();
                     delta += bet.getPay();
                 } else {
-                    income -= bet.getAmount() / 2;
                     delta -= bet.getAmount() / 2;
                 }
             }
-            player.setIncome(income);
             player.setDelta(delta);
         }
     }

@@ -10,14 +10,12 @@ public class Player {
     private final long id;
     private final String name;
     private final List<Bet> bets;
-    private int income; // delta + bet
     private int delta;
 
     public Player(long id, String name) {
         this.id = id;
         this.name = name;
         this.bets = new ArrayList<>();
-        this.income = 0;
         this.delta = 0;
     }
 
@@ -35,14 +33,6 @@ public class Player {
 
     public void addBet(Bet bet) {
         bets.add(bet);
-    }
-
-    public int getIncome() {
-        return income;
-    }
-
-    public void setIncome(int income) {
-        this.income = income;
     }
 
     public int getDelta() {

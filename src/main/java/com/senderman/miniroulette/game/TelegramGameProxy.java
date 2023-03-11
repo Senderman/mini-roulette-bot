@@ -57,7 +57,7 @@ public class TelegramGameProxy extends Game<Long> {
             text.append(formatStonks(p));
             text.append("\n\n");
             user.setPendingCoins(user.getPendingCoins() - pendingCoins);
-            user.setCoins(user.getCoins() + p.getIncome());
+            user.setCoins(user.getCoins() + p.getDelta() + pendingCoins);
             usersToSave.add(user);
         }
         userService.saveAll(usersToSave);

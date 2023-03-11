@@ -60,7 +60,7 @@ public class BetRegexCommand implements RegexCommand {
                 return;
             }
         } catch (InvalidBetRangeException e) {
-            deleteLater(game, ctx.replyToMessage("Неверный дипазон ставки!").call(ctx.sender));
+            deleteLater(game, ctx.replyToMessage("Неверный диапазон ставки!").call(ctx.sender));
             return;
         } catch (InvalidBetCommandException ignored) {
             return;
