@@ -32,6 +32,8 @@ public class MiniRouletteBot implements EmbeddedApplication<MiniRouletteBot>, Bo
                 .classes(MiniRouletteBot.class)
                 .environmentVariableIncludes(
                         "DB",
+                        "DBUSER",
+                        "DBPASS",
                         "BOT_USERNAME",
                         "BOT_TOKEN",
                         "MICRONAUT_APPLICATION_SERVER_HOST",
