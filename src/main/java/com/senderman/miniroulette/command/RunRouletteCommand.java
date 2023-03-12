@@ -4,6 +4,7 @@ import com.annimon.tgbotsmodule.commands.context.MessageContext;
 import com.senderman.miniroulette.game.GameManager;
 import com.senderman.miniroulette.game.TelegramGameProxy;
 import com.senderman.miniroulette.service.UserService;
+import io.micrometer.core.annotation.Counted;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +32,7 @@ public class RunRouletteCommand implements CommandExecutor {
     }
 
     @Override
+    @Counted(value = "bot_command", extraTags = {"command", "/rourun"})
     public void accept(@NotNull MessageContext ctx) {
         var chatId = ctx.chatId();
         if (gameManager.exists(chatId)) {

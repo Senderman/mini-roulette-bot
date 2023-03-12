@@ -19,15 +19,15 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("io.micronaut:micronaut-jackson-databind")
 
-    //annotationProcessor("io.micronaut.micrometer:micronaut-micrometer-annotation")
+    annotationProcessor("io.micronaut.micrometer:micronaut-micrometer-annotation")
     implementation("io.micronaut:micronaut-management")
-    /*implementation("io.micronaut.micrometer:micronaut-micrometer-core")
-    implementation("io.micronaut.micrometer:micronaut-micrometer-registry-prometheus")*/
+    implementation("io.micronaut.micrometer:micronaut-micrometer-core")
+    implementation("io.micronaut.micrometer:micronaut-micrometer-registry-prometheus")
 
-    annotationProcessor("io.micronaut.data:micronaut-data-document-processor")
-    implementation("io.micronaut.data:micronaut-data-mongodb")
-    runtimeOnly("org.mongodb:mongodb-driver-sync")
-    runtimeOnly("com.github.jnr:jnr-unixsocket:0.38.17")
+    annotationProcessor("io.micronaut.data:micronaut-data-processor")
+    implementation("io.micronaut.data:micronaut-data-jdbc")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    runtimeOnly("com.h2database:h2")
 
     runtimeOnly("ch.qos.logback:logback-classic:1.4.5")
 }
@@ -47,7 +47,7 @@ tasks.withType(JavaCompile).configureEach {
 
 graalvmNative.toolchainDetection = false
 micronaut {
-    // runtime 'netty'
+    runtime 'netty'
     processing {
         incremental(true)
         annotations("com.senderman.miniroulette.*")

@@ -11,7 +11,6 @@ import com.senderman.miniroulette.game.GameManager;
 import com.senderman.miniroulette.game.Player;
 import com.senderman.miniroulette.game.TelegramGameProxy;
 import com.senderman.miniroulette.game.bet.Bet;
-import com.senderman.miniroulette.model.User;
 import com.senderman.miniroulette.service.UserService;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
@@ -69,18 +68,13 @@ public class BetRegexCommand implements RegexCommand {
         try {
             game.addBet(player, bet);
             deleteLater(game, ctx.replyToMessage("Ставка принята!").call(ctx.sender));
-            pendCoins(user, bet.getAmount());
+            int amount = bet.getAmount();
+            userService.updateCoins(user.getUserId(), -amount, amount);
         } catch (TooLateException e) {
             deleteLater(game, ctx.replyToMessage("Слишком поздно! Ставки больше не принимаются!").call(ctx.sender));
         } catch (TooLittleCoinsException e) {
             deleteLater(game, ctx.replyToMessage("Минимальная ставка - 2!").call(ctx.sender));
         }
-    }
-
-    private void pendCoins(User user, int amount) {
-        user.setPendingCoins(user.getPendingCoins() + amount);
-        user.setCoins(user.getCoins() - amount);
-        userService.save(user);
     }
 
     private void deleteLater(TelegramGameProxy game, Message message) {

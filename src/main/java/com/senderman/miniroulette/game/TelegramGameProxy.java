@@ -3,11 +3,9 @@ package com.senderman.miniroulette.game;
 import com.annimon.tgbotsmodule.api.methods.Methods;
 import com.annimon.tgbotsmodule.commands.context.MessageContext;
 import com.senderman.miniroulette.game.bet.Bet;
-import com.senderman.miniroulette.model.User;
 import com.senderman.miniroulette.service.UserService;
 import com.senderman.miniroulette.util.Html;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +39,6 @@ public class TelegramGameProxy extends Game<Long> {
         var text = new StringBuilder("\uD83C\uDFB2 Итоги:\n");
         text.append(formatCell(cell)).append("\n\n");
 
-        var usersToSave = new ArrayList<User>();
         for (var p : players) {
             var user = userService.findById(p.getId());
             user.setName(p.getName());
@@ -56,11 +53,8 @@ public class TelegramGameProxy extends Game<Long> {
                     .sum();
             text.append(formatStonks(p));
             text.append("\n\n");
-            user.setPendingCoins(user.getPendingCoins() - pendingCoins);
-            user.setCoins(user.getCoins() + p.getDelta() + pendingCoins);
-            usersToSave.add(user);
+            userService.updateCoins(user.getUserId(), p.getDelta() + pendingCoins, -pendingCoins);
         }
-        userService.saveAll(usersToSave);
         ctx.reply(text.toString()).callAsync(ctx.sender);
         gameManager.delete(getId());
         messagesToDelete.forEach(mid -> Methods.deleteMessage(ctx.chatId(), mid).callAsync(ctx.sender));

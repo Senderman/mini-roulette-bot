@@ -3,21 +3,32 @@ package com.senderman.miniroulette.model;
 import io.micronaut.core.annotation.Creator;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
+import io.micronaut.data.annotation.MappedProperty;
 
+import java.sql.Timestamp;
 import java.util.Objects;
 
-@MappedEntity("user")
+@MappedEntity("USER")
 public class User {
 
     @Id
+    @MappedProperty("user_id")
     private final long userId;
+
+    @MappedProperty("name")
     private String name;
+
+    @MappedProperty("coins")
     private int coins;
+
+    @MappedProperty("pending_coins")
     private int pendingCoins; // coins invested in current games
-    private int lastCoinRequestDate;
+
+    @MappedProperty("last_coin_request_date")
+    private Timestamp lastCoinRequestDate;
 
     @Creator
-    public User(@Id long userId, String name, int coins, int pendingCoins, int lastCoinRequestDate) {
+    public User(@Id long userId, String name, int coins, int pendingCoins, Timestamp lastCoinRequestDate) {
         this.userId = userId;
         this.name = name;
         this.coins = coins;
@@ -53,11 +64,11 @@ public class User {
         this.pendingCoins = pendingCoins;
     }
 
-    public int getLastCoinRequestDate() {
+    public Timestamp getLastCoinRequestDate() {
         return lastCoinRequestDate;
     }
 
-    public void setLastCoinRequestDate(int lastCoinRequestDate) {
+    public void setLastCoinRequestDate(Timestamp lastCoinRequestDate) {
         this.lastCoinRequestDate = lastCoinRequestDate;
     }
 

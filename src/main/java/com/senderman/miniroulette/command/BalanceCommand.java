@@ -2,6 +2,7 @@ package com.senderman.miniroulette.command;
 
 import com.annimon.tgbotsmodule.commands.context.MessageContext;
 import com.senderman.miniroulette.service.UserService;
+import io.micrometer.core.annotation.Counted;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,7 @@ public class BalanceCommand implements CommandExecutor {
     }
 
     @Override
+    @Counted(value = "bot_command", extraTags = {"command", "/balance"})
     public void accept(@NotNull MessageContext ctx) {
         var user = userService.findById(ctx.message().getFrom().getId());
         String text = "\uD83D\uDCB0 Ваш баланс: %s".formatted(user.getCoins());

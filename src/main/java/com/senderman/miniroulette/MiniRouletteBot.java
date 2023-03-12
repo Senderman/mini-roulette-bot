@@ -8,6 +8,7 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.runtime.ApplicationConfiguration;
 import io.micronaut.runtime.EmbeddedApplication;
 import io.micronaut.runtime.Micronaut;
+import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ public class MiniRouletteBot implements EmbeddedApplication<MiniRouletteBot>, Bo
         Micronaut.build(args)
                 .classes(MiniRouletteBot.class)
                 .environmentVariableIncludes(
-                        "MONGODB_URI",
+                        "DB",
                         "BOT_USERNAME",
                         "BOT_TOKEN",
                         "MICRONAUT_APPLICATION_SERVER_HOST",
@@ -41,16 +42,9 @@ public class MiniRouletteBot implements EmbeddedApplication<MiniRouletteBot>, Bo
                 .start();
     }
 
-//    @Scheduled(initialDelay = "1s")
-//    protected void runBot() {
-//        new Thread(() -> Runner.run(List.of(this))).start();
-//    }
-
-
-    @Override
-    public @NotNull MiniRouletteBot start() {
-        Runner.run(List.of(this));
-        return this;
+    @Scheduled(initialDelay = "1s")
+    protected void runBot() {
+        new Thread(() -> Runner.run(List.of(this))).start();
     }
 
     @Override

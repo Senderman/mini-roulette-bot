@@ -3,6 +3,7 @@ package com.senderman.miniroulette.game;
 import com.senderman.miniroulette.exception.TooLateException;
 import com.senderman.miniroulette.exception.TooLittleCoinsException;
 import com.senderman.miniroulette.game.bet.Bet;
+import io.micrometer.core.annotation.Counted;
 import io.micronaut.core.annotation.Nullable;
 
 import java.util.Collection;
@@ -33,6 +34,7 @@ public class Game<ID> {
         runTimer();
     }
 
+    @Counted("method.addBet")
     public synchronized void addBet(Player player, Bet bet) throws TooLateException, TooLittleCoinsException {
         if (!isOpenForBets)
             throw new TooLateException();
