@@ -21,7 +21,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
             """)
     void updateCoins(long userId, String name, int coins, int pendingCoins);
 
-    @Query("UPDATE `USER` SET coins = coins + :coins, last_coin_request_date = :lastCoinRequestDate")
+    @Query("UPDATE `USER` SET coins = coins + :coins, last_coin_request_date = :lastCoinRequestDate WHERE user_id = :userId")
     void increaseCoinsSetLastCoinRequestDate(long userId, int coins, Timestamp lastCoinRequestDate);
 
     List<User> findByPendingCoinsNotEquals(int pendingCoins);
