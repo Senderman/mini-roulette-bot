@@ -12,8 +12,14 @@ import java.util.List;
 @JdbcRepository(dialect = Dialect.H2)
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    @Query("UPDATE USER SET coins = coins + (:coins), pending_coins = pending_coins + (:pendingCoins) WHERE user_id = :userId")
-    void updateCoins(long userId, int coins, int pendingCoins);
+    @Query("""
+            UPDATE USER SET
+            name = :name,
+            coins = coins + (:coins),
+            pending_coins = pending_coins + (:pendingCoins)
+            WHERE user_id = :userId
+            """)
+    void updateCoins(long userId, String name, int coins, int pendingCoins);
 
     @Query("UPDATE USER SET coins = coins + :coins, last_coin_request_date = :lastCoinRequestDate")
     void increaseCoinsSetLastCoinRequestDate(long userId, int coins, Timestamp lastCoinRequestDate);

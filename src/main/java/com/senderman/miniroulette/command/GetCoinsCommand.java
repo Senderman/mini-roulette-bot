@@ -27,7 +27,7 @@ public class GetCoinsCommand implements CommandExecutor {
     @Override
     @Counted(value = "bot_command", extraTags = {"command", "/getcoins"})
     public void accept(@NotNull MessageContext ctx) {
-        var user = userService.findById(ctx.message().getFrom().getId());
+        var user = userService.findById(ctx.message().getFrom().getId(), ctx.message().getFrom().getFirstName());
         if (user.getCoins() >= 300) {
             ctx.replyToMessage("Монетки можно запрашивать только если у вас меньше 300 монеток!").callAsync(ctx.sender);
             return;

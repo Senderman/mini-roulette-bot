@@ -23,7 +23,7 @@ public class BalanceCommand implements CommandExecutor {
     @Override
     @Counted(value = "bot_command", extraTags = {"command", "/balance"})
     public void accept(@NotNull MessageContext ctx) {
-        var user = userService.findById(ctx.message().getFrom().getId());
+        var user = userService.findById(ctx.message().getFrom().getId(), ctx.message().getFrom().getFirstName());
         String text = "\uD83D\uDCB0 Ваш баланс: %s".formatted(user.getCoins());
         if (user.getPendingCoins() != 0)
             text += " (%d сейчас в игре)".formatted(user.getPendingCoins());

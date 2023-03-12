@@ -19,9 +19,9 @@ public class H2UserService implements UserService {
     }
 
     @Override
-    public User findById(long id) {
+    public User findById(long id, String name) {
         return repo.findById(id).orElseGet(() ->
-                repo.save(new User(id, "Без имени", INITIAL_COINS_QUANTITY, 0, Timestamp.valueOf(LocalDateTime.MIN)))
+                repo.save(new User(id, name, INITIAL_COINS_QUANTITY, 0, Timestamp.valueOf(LocalDateTime.MIN)))
         );
     }
 
@@ -39,8 +39,8 @@ public class H2UserService implements UserService {
     }
 
     @Override
-    public void updateCoins(long userId, int coins, int pendingCoins) {
-        repo.updateCoins(userId, coins, pendingCoins);
+    public void updateCoins(long userId, String name, int coins, int pendingCoins) {
+        repo.updateCoins(userId, name, coins, pendingCoins);
     }
 
     @Override

@@ -40,8 +40,6 @@ public class TelegramGameProxy extends Game<Long> {
         text.append(formatCell(cell)).append("\n\n");
 
         for (var p : players) {
-            var user = userService.findById(p.getId());
-            user.setName(p.getName());
             text.append("<b>").append(Html.htmlSafe(p.getName())).append("</b>:\n");
             p.getBets()
                     .stream()
@@ -53,7 +51,7 @@ public class TelegramGameProxy extends Game<Long> {
                     .sum();
             text.append(formatStonks(p));
             text.append("\n\n");
-            userService.updateCoins(user.getUserId(), p.getDelta() + pendingCoins, -pendingCoins);
+            userService.updateCoins(p.getId(), p.getName(), p.getDelta() + pendingCoins, -pendingCoins);
         }
         ctx.reply(text.toString()).callAsync(ctx.sender);
         gameManager.delete(getId());

@@ -11,13 +11,13 @@ public interface UserService {
 
     int INITIAL_COINS_QUANTITY = 1000;
 
-    User findById(long id);
+    User findById(long id, String name);
 
     User save(User user);
 
     List<User> saveAll(Collection<User> users);
 
-    void updateCoins(@Id long userId, int coins, int pendingCoins);
+    void updateCoins(@Id long userId, String name, int coins, int pendingCoins);
 
     void increaseCoinsSetLastCoinRequestDate(@Id long userId, int coins, Timestamp lastCoinRequestDate);
 

@@ -50,7 +50,7 @@ public class BetRegexCommand implements RegexCommand {
 
         deleteLater(game, ctx.message());
         var from = ctx.message().getFrom();
-        var user = userService.findById(from.getId());
+        var user = userService.findById(from.getId(), from.getFirstName());
         final Bet bet;
         try {
             bet = Bet.parseBet(ctx.message().getText());
@@ -69,7 +69,7 @@ public class BetRegexCommand implements RegexCommand {
             game.addBet(player, bet);
             deleteLater(game, ctx.replyToMessage("Ставка принята!").call(ctx.sender));
             int amount = bet.getAmount();
-            userService.updateCoins(user.getUserId(), -amount, amount);
+            userService.updateCoins(user.getUserId(), from.getFirstName(), -amount, amount);
         } catch (TooLateException e) {
             deleteLater(game, ctx.replyToMessage("Слишком поздно! Ставки больше не принимаются!").call(ctx.sender));
         } catch (TooLittleCoinsException e) {
