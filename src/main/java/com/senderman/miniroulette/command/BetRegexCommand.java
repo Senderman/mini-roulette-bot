@@ -12,6 +12,7 @@ import com.senderman.miniroulette.game.Player;
 import com.senderman.miniroulette.game.TelegramGameProxy;
 import com.senderman.miniroulette.game.bet.Bet;
 import com.senderman.miniroulette.service.UserService;
+import io.micrometer.core.annotation.Counted;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -43,6 +44,7 @@ public class BetRegexCommand implements RegexCommand {
     }
 
     @Override
+    @Counted(value = "bot_command", extraTags = {"command", "makebet"})
     public void accept(@NotNull RegexMessageContext ctx) {
         var game = gameManager.get(ctx.chatId());
         if (game == null)
