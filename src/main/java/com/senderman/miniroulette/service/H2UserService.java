@@ -21,7 +21,7 @@ public class H2UserService implements UserService {
     @Override
     public User findById(long id, String name) {
         return repo.findById(id).orElseGet(() ->
-                repo.save(new User(id, name, INITIAL_COINS_QUANTITY, 0, Timestamp.valueOf(LocalDateTime.MIN)))
+                repo.save(new User(id, name, INITIAL_COINS_QUANTITY, 0, Timestamp.valueOf(LocalDateTime.of(1970, 1, 1, 0, 0))))
         );
     }
 

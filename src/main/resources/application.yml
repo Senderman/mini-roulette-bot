@@ -22,8 +22,13 @@ datasources:
     username: ${DBUSER:sa}
     password: ${DBPASS:sa}
     driver-class-name: org.h2.Driver
-    schema-generate: CREATE
+    schema-generate: NONE
     dialect: H2
+
+flyway:
+  datasources:
+    default:
+      enabled: true
 
 netty:
   default:
