@@ -2,7 +2,7 @@ micronaut:
   application:
     name: MiniRoulette
   server:
-    port: 1458
+    port: 8080
   metrics:
     enabled: true
     export:
@@ -13,6 +13,9 @@ micronaut:
 
 endpoints:
   prometheus:
+    enabled: true
+    sensitive: false
+  health:
     enabled: true
     sensitive: false
 
