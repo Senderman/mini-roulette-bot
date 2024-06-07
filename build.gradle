@@ -1,6 +1,7 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("io.micronaut.application") version "3.7.3"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.micronaut.application") version "4.4.0"
+    id("io.micronaut.aot") version "4.4.0"
 }
 
 group 'com.senderman'
@@ -11,26 +12,30 @@ repositories {
 }
 
 dependencies {
-    implementation('com.annimon:tgbots-module:6.5.1') {
+    implementation('com.annimon:tgbots-module:7.1.0') {
         exclude group: 'org.glassfish.grizzly', module: 'grizzly-http-server'
         exclude group: 'org.glassfish.jersey.core', module: 'jersey-server'
     }
 
+    // serialization
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("io.micronaut:micronaut-jackson-databind")
 
+    // monitoring
     annotationProcessor("io.micronaut.micrometer:micronaut-micrometer-annotation")
     implementation("io.micronaut:micronaut-management")
     implementation("io.micronaut.micrometer:micronaut-micrometer-core")
     implementation("io.micronaut.micrometer:micronaut-micrometer-registry-prometheus")
 
+    // database
     annotationProcessor("io.micronaut.data:micronaut-data-processor")
     implementation("io.micronaut.data:micronaut-data-jdbc")
-    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     implementation("io.micronaut.flyway:micronaut-flyway")
-    runtimeOnly("com.h2database:h2:2.1.210")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
+    runtimeOnly("org.postgresql:postgresql")
 
-    runtimeOnly("ch.qos.logback:logback-classic:1.4.5")
+    runtimeOnly("ch.qos.logback:logback-classic")
 }
 
 application {
@@ -38,8 +43,8 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-    targetCompatibility = JavaVersion.toVersion("17")
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -54,3 +59,26 @@ micronaut {
         annotations("com.senderman.miniroulette.*")
     }
 }
+
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime 'netty'
+    processing {
+        incremental(true)
+        annotations("com.senderman.miniroulette.*")
+    }
+    aot {
+        // Please review carefully the optimizations enabled below
+        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
+        optimizeServiceLoading = true
+        convertYamlToJava = true
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = false
+        optimizeNetty = true
+
+    }
+}
+

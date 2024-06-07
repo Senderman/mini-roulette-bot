@@ -21,12 +21,12 @@ endpoints:
 
 datasources:
   default:
-    url: jdbc:h2:${DB:`mem:miniroulette`};LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-    username: ${DBUSER:sa}
+    url: jdbc:postgresql://${DB}:${DBPORT:5432}/${DBNAME:miniroulette}
+    username: ${DBUSER:miniroulette}
     password: ${DBPASS:sa}
-    driver-class-name: org.h2.Driver
+    driver-class-name: org.postgresql.Driver
     schema-generate: NONE
-    dialect: H2
+    dialect: POSTGRES
 
 flyway:
   datasources:

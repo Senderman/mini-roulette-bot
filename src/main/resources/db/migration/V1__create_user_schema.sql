@@ -1,4 +1,4 @@
-CREATE TABLE `USER` (
+CREATE TABLE "user" (
     user_id BIGINT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     coins INT NOT NULL,

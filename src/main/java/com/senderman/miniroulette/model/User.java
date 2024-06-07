@@ -8,7 +8,7 @@ import io.micronaut.data.annotation.MappedProperty;
 import java.sql.Timestamp;
 import java.util.Objects;
 
-@MappedEntity("USER")
+@MappedEntity("user")
 public class User {
 
     @Id
