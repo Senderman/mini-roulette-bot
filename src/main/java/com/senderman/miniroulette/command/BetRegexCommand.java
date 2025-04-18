@@ -15,7 +15,7 @@ import com.senderman.miniroulette.service.UserService;
 import io.micrometer.core.annotation.Counted;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 import java.util.EnumSet;
 import java.util.regex.Pattern;

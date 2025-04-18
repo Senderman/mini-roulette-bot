@@ -1,5 +1,6 @@
-package com.senderman.miniroulette.confg;
+package com.senderman.miniroulette.config;
 
+import com.annimon.tgbotsmodule.BotModuleOptions;
 import com.annimon.tgbotsmodule.analytics.UpdateHandler;
 import com.annimon.tgbotsmodule.commands.CommandRegistry;
 import com.annimon.tgbotsmodule.commands.RegexCommand;
@@ -9,7 +10,6 @@ import com.annimon.tgbotsmodule.commands.authority.For;
 import com.annimon.tgbotsmodule.commands.authority.SimpleAuthority;
 import io.micronaut.context.annotation.Factory;
 import jakarta.inject.Singleton;
-import org.telegram.telegrambots.bots.DefaultBotOptions;
 
 import java.util.List;
 
@@ -17,15 +17,15 @@ import java.util.List;
 public class Beans {
 
     @Singleton
-    public DefaultBotOptions botOptions() {
-        var options = new DefaultBotOptions();
-        options.setAllowedUpdates(List.of("message"));
-        return options;
+    public BotModuleOptions botOptions(BotConfig config) {
+        return BotModuleOptions.create(config.token())
+                .getUpdatesGeneratorDefaultWithAllowedUpdates(List.of("message"))
+                .build();
     }
 
     @Singleton
     public Authority<For> authority(BotConfig config) {
-        return new SimpleAuthority(config.getCreatorId());
+        return new SimpleAuthority(config.creatorId());
     }
 
     @Singleton
@@ -35,7 +35,7 @@ public class Beans {
             List<TextCommand> textCommands,
             List<RegexCommand> regexCommands
     ) {
-        var registry = new CommandRegistry<>(config.getUsername(), authority);
+        var registry = new CommandRegistry<>(config.username(), authority);
         textCommands.forEach(registry::register);
         regexCommands.forEach(registry::register);
         return registry;

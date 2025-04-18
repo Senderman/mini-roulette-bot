@@ -1,7 +1,7 @@
 package com.senderman.miniroulette.command;
 
 import com.annimon.tgbotsmodule.commands.context.MessageContext;
-import com.senderman.miniroulette.confg.BotConfig;
+import com.senderman.miniroulette.config.BotConfig;
 import jakarta.inject.Singleton;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +28,6 @@ public class HelpCommand implements CommandExecutor {
 
     @Override
     public void accept(@NotNull MessageContext ctx) {
-        ctx.replyToMessage(config.getHelp()).callAsync(ctx.sender);
+        ctx.replyToMessage(config.help()).callAsync(ctx.sender);
     }
 }
