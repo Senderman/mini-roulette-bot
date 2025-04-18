@@ -19,6 +19,7 @@ public class Beans {
     @Singleton
     public BotModuleOptions botOptions(BotConfig config) {
         return BotModuleOptions.create(config.token())
+                .telegramUrlSupplierDefault()
                 .getUpdatesGeneratorDefaultWithAllowedUpdates(List.of("message"))
                 .build();
     }
