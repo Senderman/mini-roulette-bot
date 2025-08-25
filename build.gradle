@@ -36,7 +36,7 @@ dependencies {
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
 
-    runtimeOnly("ch.qos.logback:logback-classic")
+    implementation("ch.qos.logback:logback-classic")
 }
 
 application {
