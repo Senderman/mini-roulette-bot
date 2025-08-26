@@ -41,8 +41,7 @@ netty:
 bot:
   username: ${BOT_USERNAME} # bot username without @
   token: ${BOT_TOKEN} # bot token
-  creator-id: ${creator-id} # userId of the creator of the bot (or of the admin if you wish)
-  privacyPolicyLink: https://telegra.ph/Srobofactory-Privacy-Policy-07-07 # link to bot's privacy policy
+  creatorId: ${CREATOR_ID} # userId of the creator of the bot (or of the admin if you wish)
   help: |
     Для начала игры необходимо отправить команду /rourun, далее игрокам дается 30 секунд на совершение ставок
     Ставку надо делать в формате "X target", где Х - кол-во денег, которые игрок готов поставить, а target - цель. Цели могут быть следующими:

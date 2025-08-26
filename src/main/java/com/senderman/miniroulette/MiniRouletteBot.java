@@ -24,17 +24,7 @@ public class MiniRouletteBot implements BotModule {
     public static void main(String[] args) {
         Micronaut.build(args)
                 .classes(MiniRouletteBot.class)
-                .environmentVariableIncludes(
-                        "DB",
-                        "DBUSER",
-                        "DBPASS",
-                        "BOT_USERNAME",
-                        "BOT_TOKEN",
-                        "MICRONAUT_APPLICATION_SERVER_HOST",
-                        "MICRONAUT_APPLICATION_SERVER_PORT",
-                        "MICRONAUT_METRICS_ENABLED",
-                        "creator-id"
-                )
+                .banner(!System.getProperties().containsKey("disableBanner"))
                 .start();
     }
 
